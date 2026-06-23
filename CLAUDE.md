@@ -56,7 +56,8 @@ Every new team file must be added to the available team files list above in this
 - `web/index.html` — rendering engine. Never edit this.
 - `web/data.js` — the only file that changes after each game.
 Upload both to GitHub Pages, Netlify, or Vercel. Update data.js only for ongoing updates.
-Hosted at: [ADD URL ONCE DEPLOYED]
+Hosted at: https://web-alpha-two-16.vercel.app
+To redeploy after updates: `cd /Users/argod/Downloads/wc_predictions && npx vercel deploy web/ --prod`
 
 ---
 
