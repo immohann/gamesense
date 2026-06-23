@@ -3,16 +3,16 @@
 // Last updated: June 22, 2026
 
 const WC_DATA = {
-  lastUpdated: "June 22, 2026 — post ARG 2-0 AUT",
+  lastUpdated: "June 22, 2026 — post NOR 3-2 SEN + FRA 3-0 IRQ",
   venmo: "mdogra3", // Venmo handle — links auto-generated from this
 
   modelStats: {
     gamesAnalyzed:   6,
-    gamesCompleted:  2,
-    marketsTracked:  16,
-    marketsCorrect:  12,
-    marketsWrong:    4,
-    marketsPending:  35,
+    gamesCompleted:  4,
+    marketsTracked:  31,
+    marketsCorrect:  21,
+    marketsWrong:    10,
+    marketsPending:  20,
   },
 
   groups: [
@@ -28,10 +28,10 @@ const WC_DATA = {
     {
       id: "I",
       teams: [
-        { name: "Norway",  flag: "🇳🇴", p:1, w:1, d:0, l:0, gf:4, ga:1, pts:3, qualified: false },
-        { name: "France",  flag: "🇫🇷", p:1, w:1, d:0, l:0, gf:3, ga:1, pts:3, qualified: false },
-        { name: "Senegal", flag: "🇸🇳", p:1, w:0, d:0, l:1, gf:1, ga:3, pts:0, qualified: false },
-        { name: "Iraq",    flag: "🇮🇶", p:1, w:0, d:0, l:1, gf:1, ga:4, pts:0, qualified: false },
+        { name: "France",  flag: "🇫🇷", p:2, w:2, d:0, l:0, gf:6, ga:1, pts:6, qualified: true  },
+        { name: "Norway",  flag: "🇳🇴", p:2, w:2, d:0, l:0, gf:7, ga:3, pts:6, qualified: true  },
+        { name: "Senegal", flag: "🇸🇳", p:2, w:0, d:0, l:2, gf:3, ga:6, pts:0, qualified: false },
+        { name: "Iraq",    flag: "🇮🇶", p:2, w:0, d:0, l:2, gf:1, ga:7, pts:0, qualified: false },
       ]
     },
     {
@@ -131,19 +131,19 @@ const WC_DATA = {
       date: "Jun 22",
       homeTeam: { name: "Norway",  flag: "🇳🇴", code: "NOR" },
       awayTeam: { name: "Senegal", flag: "🇸🇳", code: "SEN" },
-      status: "pending",
-      kickoff: "7:00 PM CDT",
+      status: "completed",
+      result: { home: 3, away: 2 },
       predictions: {
-        winner:     { call: "Draw ⭐ (vs NOR lean)", result: null, correct: null, conf: "M" },
-        overUnder:  { call: "Under 2.5",             result: null, correct: null, conf: "M" },
-        btts:       { call: "Yes",                   result: null, correct: null, conf: "M" },
-        firstHalf:  { call: "U1.5 ⭐",              result: null, correct: null, conf: "H" },
-        secondHalf: { call: "O0.5",                  result: null, correct: null, conf: "H" },
-        scorer1:    { call: "Haaland",               result: null, correct: null, conf: "H" },
-        scorer2:    { call: "Sorloth ⭐",            result: null, correct: null, conf: "M" },
+        winner:     { call: "Draw ⭐ (vs NOR lean)", result: "NOR 3-2 — Norway controlled",       correct: false, conf: "M" },
+        overUnder:  { call: "Under 2.5",             result: "Over — 5 goals",                    correct: false, conf: "M" },
+        btts:       { call: "Yes",                   result: "Yes — Sarr scored twice",           correct: true,  conf: "M" },
+        firstHalf:  { call: "U1.5 ⭐",              result: "1-0 HT, Pedersen 43' only goal",    correct: true,  conf: "H" },
+        secondHalf: { call: "O0.5",                  result: "4 goals: Haaland ×2, Sarr ×2",     correct: true,  conf: "H" },
+        scorer1:    { call: "Haaland",               result: "Scored twice (48', 58')",           correct: true,  conf: "H" },
+        scorer2:    { call: "Sorloth ⭐",            result: "Did not score",                     correct: false, conf: "M" },
       },
-      keyInsight: "Senegal must-not-lose + Norway comfortable with draw = structural draw the cluster ignores. Koulibaly + Idrissa Gana Gueye double pivot are the tactical factors nobody mentions. Draw at +230 is the value call.",
-      score: { correct: null, total: 7 },
+      keyInsight: "Senegal never sat back — they attacked from the start, making the draw call structurally wrong. Game exploded: 5 goals, both teams open all match. 1H U1.5 ⭐ was the cleanest hit (HT 1-0, Pedersen 43'). Haaland delivered twice. Sorloth pick wrong — Norway's other goals came from Pedersen + Haaland.",
+      score: { correct: 4, total: 7 },
       report: {
         consensus: "Norway win — narrow majority. Split on the draw at +230 (Covers.com explicit value call). Over 2.5 from SportsLine citing Norway's 8 goals. Critical cluster contradiction: sources backing NOR win + Over assume SEN attacks openly; sources backing draw assume SEN defends first. These cannot both be right — group table determines which is correct.",
         gameFlow: {
@@ -198,20 +198,20 @@ const WC_DATA = {
       date: "Jun 22",
       homeTeam: { name: "France", flag: "🇫🇷", code: "FRA" },
       awayTeam: { name: "Iraq",   flag: "🇮🇶", code: "IRQ" },
-      status: "pending",
-      kickoff: "4:00 PM CDT",
+      status: "completed",
+      result: { home: 3, away: 0 },
       predictions: {
-        winner:     { call: "France",       result: null, correct: null, conf: "H" },
-        overUnder:  { call: "Over 2.5 ⭐",  result: null, correct: null, conf: "H" },
-        over35:     { call: "Over 3.5",     result: null, correct: null, conf: "M" },
-        btts:       { call: "Yes",          result: null, correct: null, conf: "M" },
-        firstHalf:  { call: "O0.5",         result: null, correct: null, conf: "M" },
-        secondHalf: { call: "O1.5 ⭐",     result: null, correct: null, conf: "H" },
-        scorer1:    { call: "Mbappe ⭐",   result: null, correct: null, conf: "H" },
-        scorer2:    { call: "Barcola",      result: null, correct: null, conf: "M" },
+        winner:     { call: "France",       result: "FRA 3-0",                         correct: true,  conf: "H" },
+        overUnder:  { call: "Over 2.5 ⭐",  result: "Over — 3 goals",                 correct: true,  conf: "H" },
+        secondHalf: { call: "O1.5 ⭐",     result: "2 goals (Mbappe 54', Dembele 66')", correct: true,  conf: "H" },
+        scorer1:    { call: "Mbappe ⭐",   result: "2 goals (14', 54')",              correct: true,  conf: "H" },
+        firstHalf:  { call: "O0.5",         result: "Yes — Mbappe 14'",               correct: true,  conf: "M" },
+        over35:     { call: "Over 3.5",     result: "Under — exactly 3 goals",        correct: false, conf: "M" },
+        btts:       { call: "Yes",          result: "No — Iraq 0 shots on target",    correct: false, conf: "M" },
+        scorer2:    { call: "Barcola",      result: "Dembele scored, not Barcola",    correct: false, conf: "M" },
       },
-      keyInsight: "Iraq MUST WIN — they cannot park the bus for 90 mins. This removes their only defensive option and opens the game beyond every giant-vs-minnow template. Iraq's urgency is the mechanism behind Over 3.5, not France's quality alone.",
-      score: { correct: null, total: 8 },
+      keyInsight: "Mbappe brace + Dembele sealed it. Iraq's 0 shots on target killed the BTTS call — they never truly threatened despite 44% possession. 2H O1.5 ⭐ hit cleanly (54' + 66') despite a 2-hour lightning delay. Over 3.5 missed narrowly — exactly 3. Dembele started and scored; Barcola pick was wrong.",
+      score: { correct: 5, total: 8 },
       report: {
         consensus: "France to win — unanimous at -1500. Total goals split: Over 2.5 consensus, Over 3.5 at ~-124 is the sharper value debate (CBS SportsLine specific pick). Internal contradiction: some sources calling 3-0 France while backing BTTS Yes simultaneously.",
         gameFlow: {
