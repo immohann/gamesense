@@ -3,16 +3,16 @@
 // Last updated: June 22, 2026
 
 const WC_DATA = {
-  lastUpdated: "June 22, 2026 — post NOR 3-2 SEN + FRA 3-0 IRQ",
+  lastUpdated: "June 22, 2026 — JOR vs ALG analysis updated (Mahrez starts)",
   venmo: "mdogra3", // Venmo handle — links auto-generated from this
 
   modelStats: {
     gamesAnalyzed:   6,
     gamesCompleted:  4,
-    marketsTracked:  31,
+    marketsTracked:  32,
     marketsCorrect:  21,
     marketsWrong:    10,
-    marketsPending:  20,
+    marketsPending:  21,
   },
 
   groups: [
@@ -163,33 +163,35 @@ const WC_DATA = {
     {
       id: "alg-jor",
       date: "Jun 22",
-      homeTeam: { name: "Algeria", flag: "🇩🇿", code: "ALG" },
-      awayTeam: { name: "Jordan",  flag: "🇯🇴", code: "JOR" },
+      homeTeam: { name: "Jordan",  flag: "🇯🇴", code: "JOR" },
+      awayTeam: { name: "Algeria", flag: "🇩🇿", code: "ALG" },
       status: "pending",
       kickoff: "10:00 PM CDT",
       predictions: {
-        winner:    { call: "Algeria",      result: null, correct: null, conf: "M" },
-        overUnder: { call: "Over 2.5 ⭐",  result: null, correct: null, conf: "H" },
-        btts:      { call: "Yes ⭐",       result: null, correct: null, conf: "H" },
-        firstHalf: { call: "U1.5",         result: null, correct: null, conf: "M" },
-        scorer1:   { call: "Gouiri ⭐",    result: null, correct: null, conf: "H" },
-        scorer2:   { call: "Tamari",       result: null, correct: null, conf: "M" },
+        winner:     { call: "Algeria",       result: null, correct: null, conf: "MH" },
+        firstHalf:  { call: "Over 0.5 ⭐",  result: null, correct: null, conf: "H"  },
+        scorer1:    { call: "Mahrez ⭐",     result: null, correct: null, conf: "H"  },
+        secondHalf: { call: "Over 1.5",      result: null, correct: null, conf: "MH" },
+        overUnder:  { call: "Over 2.5",      result: null, correct: null, conf: "M"  },
+        btts:       { call: "Yes",           result: null, correct: null, conf: "M"  },
+        scorer2:    { call: "Gouiri",        result: null, correct: null, conf: "M"  },
       },
-      keyInsight: "Pattern 2 in reverse: both must win → both attack from KO → Over/BTTS is the structural call. Mahrez confirmed starting. Eimer's Under 2.5 dissent rejected — 'both desperate = caution' fails when neither team can defend for a draw. Jordan's 0.9+ xG vs AUT (4 shots on target, scored at 50') means they WILL find the net.",
-      score: { correct: null, total: 6 },
+      keyInsight: "Mahrez starts — Algeria's MD1 zero shots on target was vs Romero + Lisandro Martinez, the best CB pair in the tournament. Against Jordan's defense that number means nothing. Jordan conceded a first-half goal in each of their last 4 competitive fixtures: 1H Over 0.5 is the cleanest call on the board. Eimer's Under 2.5 'important game = caution' is inverted — both must win = both attack.",
+      score: { correct: null, total: 7 },
       report: {
-        consensus: "Algeria unanimous at -195 (Opta 60.7% win, 25k simulations). O/U split: majority Over (Racing Post bet builder, Covers -108, RotoWire 1-2 implied) vs Eimer/CBS Under (-110). Scorer cluster: Gouiri at +125/+165 (primary), Mahrez, Amoura. Key trap: Algeria 0-3 scoreline anchoring — that was vs Romero/Lisandro. Jordan's backline is categorically different. Jordan's 1-3 scoreline overstates their performance — 4 shots on target, more than Austria's 3.",
+        consensus: "Algeria unanimous at -185 (Sportytrader 54.6% win, Jordan just 21.9%). O/U split: Eimer/SportsLine Under 2.5 — 'both worst teams in group, caution'; SportsCasting supercomputer Over 2.5 — 'Jordan must attack and take risks.' CBS Sports contrarian: Jordan 2-2 Algeria, 'underestimate Jordan at your own risk.' Fox Sports backs Algeria Win to Nil +140 but can't decide O/U. Racing Post notes Algeria lost just 2 of last 19 + clean sheets in 4 of last 5. Cluster blind spot: nobody is quality-adjusting Algeria's MD1 — 0 shots vs Argentina (Romero + Lisandro) projects nothing vs Jordan's defense.",
         gameFlow: {
-          home:      "Algeria — MUST WIN. Push forward from minute 1. Mahrez confirmed starting = creative mechanism fully active. Ait-Nouri overlapping left creates width overloads on Jordan's exposed wingback.",
-          away:      "Jordan — MUST WIN. Cannot park the bus. Deep block (their best shape) is structurally unavailable tonight. Tamari roaming right = counter-attack mechanism when Algeria overcommit (they will).",
-          mechanism: "ALG: Mahrez cuts inside from right half-space, Gouiri arrives late from second position, Ait-Nouri wide left. Set pieces: Mahrez delivery quality vs Jordan's OG+pen vulnerability vs AUT. JOR: Tamari counter pace in channels when Algeria push men forward. Olwan movement (scored vs AUT).",
-          trigger:   "Open from kick-off — both must win removes any settling period. First goal escalates desperation immediately, accelerating all subsequent goals.",
+          home:      "Jordan — MUST WIN. MD3 is vs rotating Argentina = their best shot at 6pts via wild card. Every incentive to attack. Al-Tamari (Crystal Palace) is the counter-attack weapon when Algeria overcommit. Olwan aerial CF scored vs Austria. Zidane GK flagged as vulnerable — Jordan will test him.",
+          away:      "Algeria — MUST WIN. Mahrez STARTS (was on the bench vs ARG — massive difference). 4-3-3: Ait-Nouri + Bensebaini overlapping FBs, Aouar controlling midfield, Mahrez right vs Jordan's left back. Multiple European-quality attacking routes. Algeria lost just 2 of last 19, 4 straight clean sheets before ARG.",
+          mechanism: "ALG: Mahrez right side vs Jordan's limited LB — direct dribble, cut inside, left-foot shot. Gouiri late runs behind. Ait-Nouri/Bensebaini overlapping width. Aouar threading through lines. Set pieces: aerial threat from Mandi + Bensebaini. JOR: Al-Tamari counter pace behind Algeria's high line when they overcommit. Olwan aerial vs crosses (Zidane vulnerable). Fakhoury link play.",
+          trigger:   "From kickoff — both must win removes any cautious opener. First Algeria goal escalates Jordan's need to push, creating more counter space. Game gets more open with each passing minute.",
         },
         stressTest: [
-          "Eimer (CBS, 21-10 run) backs Under 2.5 — dissent rejected: 'both desperate = caution' fails mechanism test. Both must win = both attack. Pattern 2 runs in reverse here. Over confirmed.",
-          "Algeria's 0 xG vs ARG cannot project forward — Romero/Lisandro are the best CB pair in the tournament. Jordan's backline is average. Mahrez starting = mechanism active. Algeria winner stays Medium (not dropped).",
-          "Jordan's 1-3 scoreline overstates their defensive problems — 0.9+ xG, 4 shots on target, Olwan scored at 50'. BTTS mechanism confirmed. Avoid Algeria win-to-nil (+140, FOX).",
-          "Chaibi (Racing Post anytime bet builder pick) is NOT in the starting lineup — likely sub. Don't back as primary scorer. Gouiri (+125) is the correct play.",
+          "Eimer's Under 2.5 ('match importance = caution') inverted — both-must-win = both attack. ARG vs AUT was neither-needed-to-win = Under. This is the exact opposite dynamic. Over 2.5 is the correct structural read.",
+          "Algeria's 0 shots on target vs ARG = pure scoreline anchoring. Romero + Lisandro Martinez are the best CB pair in the tournament. Algeria with Mahrez starting vs Jordan's defense is a completely different proposition. Algeria ceiling significantly higher tonight.",
+          "Luca Zidane GK vulnerability is real and confirmed — CBS Sports flagged it. Jordan's set pieces + Al-Tamari crosses will target him. This is the primary mechanism supporting BTTS over Algeria win-to-nil (+140). Fox Sports win-to-nil underweights Jordan's counter quality.",
+          "Jordan's 4 shots on target vs Austria (more than Austria's 3) shows they are competitive. They equalized at 50' vs a Rangnick system. Al-Tamari and Olwan are genuine threats. Algeria win to nil is not a strong play — Jordan will score at some point.",
+          "Jordan's MD3 vs rotating Argentina gives them more incentive to win tonight. 3pts tonight + 3pts vs rotation = wild card path. Both teams fully attack. No defensive setup from either side.",
         ],
       },
     },
