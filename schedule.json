@@ -1,0 +1,22 @@
+{
+  "note": "kickoffUTC in ISO 8601. null = date not yet confirmed. status: completed|pending|upcoming.",
+  "matches": [
+
+    { "matchId": "nzl-egy",  "home": "NZL", "away": "EGY", "date": "2026-06-21", "kickoff": "8:00 PM CDT",  "kickoffUTC": "2026-06-22T01:00:00Z", "group": "G", "matchday": 2, "status": "completed" },
+    { "matchId": "arg-aut",  "home": "ARG", "away": "AUT", "date": "2026-06-22", "kickoff": "12:00 PM CDT", "kickoffUTC": "2026-06-22T17:00:00Z", "group": "J", "matchday": 2, "status": "completed" },
+
+    { "matchId": "fra-irq",  "home": "FRA", "away": "IRQ", "date": "2026-06-22", "kickoff": "4:00 PM CDT",  "kickoffUTC": "2026-06-22T21:00:00Z", "group": "I", "matchday": 2, "status": "pending"   },
+    { "matchId": "nor-sen",  "home": "NOR", "away": "SEN", "date": "2026-06-22", "kickoff": "7:00 PM CDT",  "kickoffUTC": "2026-06-23T00:00:00Z", "group": "I", "matchday": 2, "status": "pending"   },
+    { "matchId": "alg-jor",  "home": "ALG", "away": "JOR", "date": "2026-06-22", "kickoff": "10:00 PM CDT", "kickoffUTC": "2026-06-23T03:00:00Z", "group": "J", "matchday": 2, "status": "upcoming"  },
+    { "matchId": "por-uzb",  "home": "POR", "away": "UZB", "date": "2026-06-23", "kickoff": "12:00 PM CDT", "kickoffUTC": "2026-06-23T17:00:00Z", "group": "K", "matchday": 2, "status": "upcoming"  },
+
+    { "matchId": "bel-nzl",  "home": "BEL", "away": "NZL", "date": "TBD", "kickoff": "TBD", "kickoffUTC": null, "group": "G", "matchday": 3, "status": "upcoming" },
+    { "matchId": "egy-irn",  "home": "EGY", "away": "IRN", "date": "TBD", "kickoff": "TBD", "kickoffUTC": null, "group": "G", "matchday": 3, "status": "upcoming" },
+    { "matchId": "nor-fra",  "home": "NOR", "away": "FRA", "date": "TBD", "kickoff": "TBD", "kickoffUTC": null, "group": "I", "matchday": 3, "status": "upcoming" },
+    { "matchId": "sen-irq",  "home": "SEN", "away": "IRQ", "date": "TBD", "kickoff": "TBD", "kickoffUTC": null, "group": "I", "matchday": 3, "status": "upcoming" },
+    { "matchId": "arg-jor",  "home": "ARG", "away": "JOR", "date": "TBD", "kickoff": "TBD", "kickoffUTC": null, "group": "J", "matchday": 3, "status": "upcoming" },
+    { "matchId": "aut-alg",  "home": "AUT", "away": "ALG", "date": "TBD", "kickoff": "TBD", "kickoffUTC": null, "group": "J", "matchday": 3, "status": "upcoming" },
+    { "matchId": "por-col",  "home": "POR", "away": "COL", "date": "TBD", "kickoff": "TBD", "kickoffUTC": null, "group": "K", "matchday": 3, "status": "upcoming" },
+    { "matchId": "uzb-cod",  "home": "UZB", "away": "COD", "date": "TBD", "kickoff": "TBD", "kickoffUTC": null, "group": "K", "matchday": 3, "status": "upcoming" }
+  ]
+}

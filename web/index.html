@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Sense · WC2026 Match Intelligence</title>
+  <meta name="description" content="Quantified World Cup 2026 match intelligence. 6-phase analysis: xG-anchored, motivation-mapped, stress-tested picks.">
+  <meta property="og:title" content="Game Sense · WC2026">
+  <meta property="og:description" content="Live WC2026 picks powered by the 6-phase Game Sense framework.">
+
+  <!-- Fonts: Barlow Condensed (display) · Fira Code (data) · Fira Sans (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="data.js"></script>
+
+  <style>
+/* ══════════════════════════════════════════════════════════════
+   TOKENS — DARK (default)
+══════════════════════════════════════════════════════════════ */
+:root {
+  --bg:         #020617;
+  --bg-1:       #080d1c;
+  --bg-2:       #0d1426;
+  --card:       rgba(8,13,28,0.92);
+  --border:     rgba(255,255,255,0.072);
+  --border-hi:  rgba(59,130,246,0.45);
+
+  --blue:       #3b82f6;
+  --blue-dim:   rgba(59,130,246,0.13);
+  --green:      #22c55e;
+  --green-dim:  rgba(34,197,94,0.13);
+  --red:        #ef4444;
+  --red-dim:    rgba(239,68,68,0.13);
+  --amber:      #f59e0b;
+  --amber-dim:  rgba(245,158,11,0.13);
+
+  --text:       #f1f5f9;
+  --text-2:     #8b9ab4;
+  --text-3:     #4a5578;
+
+  --gd:         linear-gradient(135deg,#3b82f6,#6366f1);
+  --gd-alt:     linear-gradient(135deg,#3b82f6,#22c55e);
+  --blur:       blur(20px);
+  --r:          10px;
+  --canvas-op:  1;
+
+  --font-d: 'Barlow Condensed', sans-serif;  /* display  */
+  --font-n: 'Fira Code', monospace;          /* numbers/data */
+  --font-b: 'Fira Sans', system-ui, sans-serif; /* body   */
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TOKENS — LIGHT
+══════════════════════════════════════════════════════════════ */
+[data-theme="light"] {
+  --bg:         #edf2fc;
+  --bg-1:       #e4ecf8;
+  --bg-2:       #ffffff;
+  --card:       rgba(255,255,255,0.97);
+  --border:     rgba(10,20,60,0.09);
+  --border-hi:  rgba(59,130,246,0.5);
+  --green-dim:  rgba(34,197,94,0.1);
+  --red-dim:    rgba(239,68,68,0.1);
+  --amber-dim:  rgba(245,158,11,0.1);
+  --blue-dim:   rgba(59,130,246,0.1);
+  --text:       #0c1630;
+  --text-2:     #364060;
+  --text-3:     #6878a0;
+  --canvas-op:  0.05;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RESET
+══════════════════════════════════════════════════════════════ */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body {
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-b);
+  font-size:13.5px;
+  line-height:1.55;
+  overflow-x:hidden;
+  transition:background .3s,color .3s;
+}
+a  { text-decoration:none; color:inherit; }
+button { cursor:pointer; font-family:inherit; border:none; background:none; }
+
+/* ══════════════════════════════════════════════════════════════
+   CANVAS
+══════════════════════════════════════════════════════════════ */
+#bg {
+  position:fixed; inset:0; z-index:0;
+  pointer-events:none;
+  opacity:var(--canvas-op);
+  transition:opacity .5s;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   NAV
+══════════════════════════════════════════════════════════════ */
+#nav {
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  background:rgba(2,6,23,.78);
+  backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur);
+  border-bottom:1px solid var(--border);
+  transition:background .3s;
+}
+[data-theme="light"] #nav { background:rgba(237,242,252,.88); }
+
+.nav-inner {
+  max-width:1300px; margin:0 auto; padding:0 20px;
+  height:54px; display:flex; align-items:center; gap:16px;
+}
+
+/* Brand */
+.nav-brand { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.brand-name {
+  font-family:var(--font-d);
+  font-size:20px; font-weight:900; letter-spacing:.08em; text-transform:uppercase;
+  background:var(--gd-alt);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.brand-year {
+  font-family:var(--font-n);
+  font-size:10px; font-weight:600; letter-spacing:.06em;
+  color:var(--text-3);
+  border:1px solid var(--border);
+  padding:2px 6px; border-radius:4px;
+}
+
+/* Accuracy ticker (center) */
+.nav-acc {
+  flex:1; display:flex; align-items:center; justify-content:center;
+  gap:12px;
+}
+.nav-acc-rate {
+  font-family:var(--font-n);
+  font-size:13px; font-weight:600;
+  background:var(--gd-alt);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.nav-acc-detail { font-size:11px; color:var(--text-3); }
+.nav-acc-sep { width:1px; height:14px; background:var(--border); }
+
+/* Right controls */
+.nav-right { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+.visitor-ct {
+  display:flex; align-items:center; gap:5px;
+  font-family:var(--font-n);
+  font-size:11px; color:var(--text-3);
+  opacity:0; transition:opacity .5s;
+}
+.visitor-ct svg { opacity:.5; }
+.nav-icon-btn {
+  display:flex; align-items:center; justify-content:center;
+  width:34px; height:34px; border-radius:8px;
+  background:var(--border); color:var(--text-2);
+  transition:background .2s,color .2s;
+}
+.nav-icon-btn:hover { background:var(--blue-dim); color:var(--blue); }
+.venmo-btn {
+  display:flex; align-items:center; gap:6px;
+  font-family:var(--font-b);
+  font-size:12px; font-weight:600;
+  padding:7px 14px; border-radius:20px;
+  background:rgba(61,149,206,.15);
+  border:1px solid rgba(61,149,206,.3);
+  color:#4aa8d8;
+  transition:all .2s; white-space:nowrap;
+}
+.venmo-btn:hover { background:rgba(61,149,206,.28); border-color:#4aa8d8; color:#fff; }
+.venmo-btn svg { flex-shrink:0; }
+
+/* ══════════════════════════════════════════════════════════════
+   DASHBOARD LAYOUT
+══════════════════════════════════════════════════════════════ */
+.dash {
+  position:relative; z-index:1;
+  max-width:1300px; margin:0 auto;
+  padding:70px 20px 64px;
+  display:grid;
+  grid-template-columns:268px 1fr;
+  gap:20px;
+  align-items:start;
+}
+@media(max-width:980px) {
+  .dash { grid-template-columns:1fr; padding-top:62px; }
+  .sidebar { display:contents; }
+  .sb-sticky-wrap { order:-1; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════════════════════════ */
+.sb-sticky-wrap {
+  position:sticky; top:62px;
+  display:flex; flex-direction:column; gap:12px;
+  max-height:calc(100vh - 80px);
+  overflow-y:auto; scrollbar-width:none;
+}
+.sb-sticky-wrap::-webkit-scrollbar { display:none; }
+
+/* Sidebar base card */
+.sb-card {
+  background:var(--card);
+  backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  overflow:hidden;
+  transition:border-color .2s;
+}
+
+/* Stats card with arc gauge */
+.stats-body { padding:18px 18px 14px; }
+
+/* Arc gauge */
+.gauge-wrap { position:relative; display:flex; justify-content:center; margin-bottom:4px; }
+.gauge-wrap svg { width:124px; height:72px; display:block; }
+.gauge-center {
+  position:absolute; bottom:2px; left:50%; transform:translateX(-50%);
+  text-align:center; white-space:nowrap;
+}
+.gauge-pct {
+  font-family:var(--font-n);
+  font-size:22px; font-weight:600; line-height:1;
+  background:var(--gd-alt);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.gauge-lbl { font-size:9px; color:var(--text-3); letter-spacing:.1em; text-transform:uppercase; margin-top:1px; }
+
+.stats-row {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:10px;
+}
+.stats-label { font-size:11px; color:var(--text-3); font-weight:500; }
+.stats-val { font-family:var(--font-n); font-size:12px; color:var(--text-2); }
+
+.stats-bar { height:4px; background:var(--border); border-radius:2px; overflow:hidden; margin-bottom:12px; }
+.stats-bar-fill { height:100%; background:var(--gd-alt); border-radius:2px; width:0; transition:width 1.1s ease; }
+
+.stats-chips { display:flex; gap:6px; flex-wrap:wrap; }
+.chip {
+  font-family:var(--font-n);
+  font-size:10px; font-weight:600;
+  padding:3px 8px; border-radius:20px; white-space:nowrap;
+}
+.chip-g { background:var(--green-dim); color:var(--green); }
+.chip-r { background:var(--red-dim);   color:var(--red);   }
+.chip-b { background:var(--blue-dim);  color:var(--blue);  }
+
+/* Sidebar section header */
+.sb-head {
+  padding:9px 14px;
+  background:rgba(0,0,0,.15);
+  border-bottom:1px solid var(--border);
+  font-family:var(--font-d);
+  font-size:10px; font-weight:700; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--text-3);
+}
+[data-theme="light"] .sb-head { background:rgba(0,0,0,.04); }
+
+/* Mini group tables */
+.mg-group-block { border-bottom:1px solid var(--border); }
+.mg-group-block:last-child { border-bottom:none; }
+.mg-title {
+  display:flex; align-items:center; gap:8px;
+  padding:6px 14px;
+  background:rgba(0,0,0,.1);
+}
+[data-theme="light"] .mg-title { background:rgba(0,0,0,.03); }
+.mg-letter {
+  font-family:var(--font-d);
+  font-size:14px; font-weight:900;
+  background:var(--gd-alt);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.mg-teams { font-size:10px; color:var(--text-3); line-height:1.3; }
+table.mgt { width:100%; border-collapse:collapse; }
+table.mgt td {
+  padding:5px 14px;
+  font-size:11px;
+  border-bottom:1px solid rgba(255,255,255,.03);
+  text-align:right;
+}
+[data-theme="light"] table.mgt td { border-bottom-color:rgba(0,0,0,.03); }
+table.mgt tr:last-child td { border-bottom:none; }
+table.mgt td:first-child { text-align:left; }
+.mgt-row { display:flex; align-items:center; gap:6px; }
+.mgt-pos {
+  font-family:var(--font-n);
+  font-size:9px; color:var(--text-3); width:10px; text-align:right; flex-shrink:0;
+}
+.mgt-flag { font-size:13px; }
+.mgt-name { font-size:11px; color:var(--text-2); }
+.mgt-pts { font-family:var(--font-n); font-weight:600; color:var(--text); }
+.mgt-gd  { font-family:var(--font-n); font-size:10px; }
+.mgt-q td { background:rgba(34,197,94,.04); }
+.qdot {
+  display:inline-block; width:5px; height:5px;
+  border-radius:50%; background:var(--green);
+  margin-left:4px; vertical-align:middle;
+}
+
+/* Pattern list */
+.pat-item {
+  display:flex; align-items:flex-start; gap:10px;
+  padding:10px 14px;
+  border-bottom:1px solid rgba(255,255,255,.03);
+  border-left:2px solid transparent;
+  transition:background .15s, border-color .15s;
+}
+[data-theme="light"] .pat-item { border-bottom-color:rgba(0,0,0,.04); }
+.pat-item:last-child { border-bottom:none; }
+.pat-item:hover { background:rgba(245,158,11,.06); border-left-color:var(--amber); }
+.pat-id {
+  font-family:var(--font-n);
+  font-size:16px; font-weight:600;
+  color:rgba(255,255,255,.08);
+  flex-shrink:0; line-height:1.1; padding-top:2px; width:24px;
+}
+[data-theme="light"] .pat-id { color:rgba(0,0,0,.12); }
+.pat-lock-icon { flex-shrink:0; padding-top:2px; color:var(--amber); opacity:.8; }
+.pat-text {}
+.pat-title { font-size:12px; font-weight:600; color:var(--text); margin-bottom:3px; }
+.pat-desc  { font-size:10.5px; color:var(--text-3); line-height:1.5; }
+
+/* ══════════════════════════════════════════════════════════════
+   MAIN CONTENT
+══════════════════════════════════════════════════════════════ */
+.main-col { display:flex; flex-direction:column; gap:28px; }
+
+/* Section header */
+.sec-hd {
+  display:flex; align-items:center; gap:10px;
+  margin-bottom:14px;
+}
+.sec-lbl {
+  font-family:var(--font-d);
+  font-size:10px; font-weight:700; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--text-3); white-space:nowrap;
+}
+.sec-rule { flex:1; height:1px; background:var(--border); }
+.sec-sub  { font-family:var(--font-n); font-size:10px; color:var(--text-3); white-space:nowrap; }
+
+/* Match grid */
+.match-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(330px,1fr));
+  gap:14px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MATCH CARD
+══════════════════════════════════════════════════════════════ */
+.mc {
+  background:var(--card);
+  backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  overflow:hidden;
+  transition:border-color .22s, box-shadow .22s, transform .22s;
+}
+.mc:hover {
+  border-color:var(--border-hi);
+  box-shadow:0 0 30px rgba(59,130,246,.07), 0 8px 28px rgba(0,0,0,.4);
+  transform:translateY(-2px);
+}
+
+/* Top accent stripe */
+.mc-stripe { height:3px; }
+.mc-stripe.good  { background:linear-gradient(90deg,var(--green),#06b6d4); }
+.mc-stripe.mixed { background:linear-gradient(90deg,var(--amber),var(--red)); }
+.mc-stripe.bad   { background:var(--red); }
+.mc-stripe.live  { background:var(--blue); animation:pulse-bar 1.8s infinite; }
+.mc-stripe.soon  { background:var(--border); }
+
+/* Card header */
+.mc-hdr {
+  padding:10px 14px 8px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.mc-date { font-family:var(--font-n); font-size:10px; color:var(--text-3); }
+.mc-badge {
+  font-family:var(--font-d);
+  font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  padding:2px 8px; border-radius:20px;
+}
+.b-done { background:var(--green-dim); color:var(--green); }
+.b-live { background:var(--blue-dim);  color:var(--blue);  }
+.b-soon { background:var(--border);    color:var(--text-3); }
+
+/* Teams + score */
+.mc-matchup {
+  padding:0 14px 12px;
+  display:flex; align-items:center; justify-content:space-between; gap:6px;
+}
+.mc-team { display:flex; align-items:center; gap:7px; min-width:0; flex:1; }
+.mc-team.away { flex-direction:row-reverse; }
+.t-flag { font-size:22px; flex-shrink:0; }
+.t-name {
+  font-family:var(--font-d);
+  font-size:15px; font-weight:700; letter-spacing:.03em;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.mc-result-score {
+  font-family:var(--font-n);
+  font-size:28px; font-weight:600; letter-spacing:.04em;
+  text-align:center; min-width:66px; flex-shrink:0;
+}
+.sc-sep { color:var(--border-hi); margin:0 2px; }
+.mc-ko { text-align:center; min-width:72px; flex-shrink:0; }
+.ko-t {
+  font-family:var(--font-n);
+  font-size:16px; font-weight:600; color:var(--blue);
+}
+.ko-l { font-size:9px; color:var(--text-3); letter-spacing:.1em; text-transform:uppercase; margin-top:2px; }
+
+/* ── Predictions table ── */
+.mc-preds { border-top:1px solid var(--border); }
+.preds-th {
+  display:flex; align-items:center;
+  padding:4px 14px;
+  background:rgba(0,0,0,.15);
+  border-bottom:1px solid var(--border);
+}
+[data-theme="light"] .preds-th { background:rgba(0,0,0,.04); }
+.pth { font-family:var(--font-d); font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-3); }
+.pth-mkt  { width:80px; flex-shrink:0; }
+.pth-pick { flex:1; }
+.pth-conf { width:30px; text-align:center; flex-shrink:0; }
+.pth-res  { flex:1; }
+.pth-icon { width:20px; flex-shrink:0; }
+
+.pred-row {
+  display:flex; align-items:center;
+  padding:5px 14px; gap:6px;
+  border-bottom:1px solid rgba(255,255,255,.025);
+  border-left:2px solid transparent;
+  transition:border-left-color .15s;
+}
+[data-theme="light"] .pred-row { border-bottom-color:rgba(0,0,0,.04); }
+.pred-row:last-child { border-bottom:none; }
+.pred-row.p-win  { border-left-color:rgba(34,197,94,.35); }
+.pred-row.p-lose { border-left-color:rgba(239,68,68,.35); }
+
+.p-mkt { width:80px; flex-shrink:0; font-size:10px; color:var(--text-3); letter-spacing:.04em; text-transform:uppercase; }
+.p-pick { flex:1; font-family:var(--font-n); font-size:11.5px; font-weight:600; display:flex; align-items:center; gap:4px; }
+.p-pick .star { color:var(--amber); font-size:9px; }
+
+/* Signal-strength confidence bars */
+.sig { display:inline-flex; align-items:flex-end; gap:2px; height:14px; flex-shrink:0; }
+.sig i { display:block; width:3px; border-radius:1.5px; background:var(--border); }
+.sig i:nth-child(1) { height:5px; }
+.sig i:nth-child(2) { height:9px; }
+.sig i:nth-child(3) { height:13px; }
+.sig.H i               { background:var(--green); }
+.sig.M i:nth-child(1),
+.sig.M i:nth-child(2)  { background:var(--amber); }
+.sig.L i:nth-child(1)  { background:var(--text-3); }
+.pth-conf .sig-hdr     { font-family:var(--font-d); font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-3); }
+
+.p-result { flex:1; font-size:11px; color:var(--text-2); }
+.p-icon {
+  width:20px; text-align:center; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+}
+.icon-win  { color:var(--green); }
+.icon-lose { color:var(--red);   }
+.icon-pend { color:var(--text-3); }
+
+/* Insight */
+.mc-insight {
+  margin:0 14px 12px;
+  padding:9px 12px;
+  background:rgba(59,130,246,.05);
+  border-left:2px solid rgba(59,130,246,.3);
+  border-radius:0 7px 7px 0;
+  font-size:11.5px; color:var(--text-2); line-height:1.65;
+}
+
+/* Score bar */
+.mc-scorebar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:8px 14px;
+  background:rgba(0,0,0,.2);
+  border-top:1px solid var(--border);
+}
+[data-theme="light"] .mc-scorebar { background:rgba(0,0,0,.04); }
+.mc-sb-lbl { font-size:10px; color:var(--text-3); }
+.mc-sb-frac { font-family:var(--font-n); font-size:16px; font-weight:600; }
+
+/* ── Full Analysis expandable ── */
+.report-toggle {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:9px 14px;
+  border-top:1px solid var(--border);
+  background:rgba(0,0,0,.12);
+  cursor:pointer; transition:background .15s;
+  width:100%; text-align:left;
+}
+[data-theme="light"] .report-toggle { background:rgba(0,0,0,.03); }
+.report-toggle:hover { background:var(--blue-dim); }
+.rt-label { font-family:var(--font-d); font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--text-3); }
+.report-toggle:hover .rt-label { color:var(--blue); }
+.rt-caret { color:var(--text-3); transition:transform .25s; font-size:11px; }
+.rt-caret.open { transform:rotate(180deg); }
+
+.report-body { max-height:0; overflow:hidden; transition:max-height .38s ease; }
+.report-body.open { max-height:640px; border-top:1px solid var(--border); }
+
+.rb-inner { padding:14px; display:flex; flex-direction:column; gap:12px; }
+
+.rb-block {}
+.rb-block-title {
+  font-family:var(--font-d);
+  font-size:9px; font-weight:700; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--text-3); margin-bottom:6px;
+  display:flex; align-items:center; gap:6px;
+}
+.rb-block-title::after { content:''; flex:1; height:1px; background:var(--border); }
+.rb-text { font-size:11.5px; color:var(--text-2); line-height:1.65; }
+
+.rb-flow-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.rb-flow-item {}
+.rb-flow-item.span2 { grid-column:1/-1; }
+.rb-flow-key {
+  font-family:var(--font-d);
+  font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--text-3); margin-bottom:3px;
+}
+.rb-flow-val { font-size:11px; color:var(--text-2); line-height:1.55; }
+
+.rb-stress-list { list-style:none; display:flex; flex-direction:column; gap:5px; }
+.rb-stress-list li {
+  display:flex; gap:8px;
+  font-size:11px; color:var(--text-2); line-height:1.55;
+}
+.rb-stress-list li::before {
+  content:'→'; color:var(--amber); flex-shrink:0;
+  font-size:10px; margin-top:1px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   VENMO SUPPORT SECTION
+══════════════════════════════════════════════════════════════ */
+.support-card {
+  background:var(--card);
+  backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:20px 22px;
+  display:flex; align-items:center; gap:18px; flex-wrap:wrap;
+  transition:border-color .2s;
+}
+.support-card:hover { border-color:rgba(61,149,206,.45); }
+.support-icon {
+  width:44px; height:44px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(61,149,206,.12);
+  border-radius:12px; border:1px solid rgba(61,149,206,.2);
+  color:#4aa8d8;
+}
+.support-text { flex:1; min-width:160px; }
+.support-title {
+  font-family:var(--font-d);
+  font-size:17px; font-weight:800; margin-bottom:3px;
+}
+.support-sub { font-size:12px; color:var(--text-2); line-height:1.6; }
+.venmo-cta {
+  display:inline-flex; align-items:center; gap:7px;
+  font-family:var(--font-b);
+  font-size:13px; font-weight:700;
+  padding:10px 22px; border-radius:50px;
+  background:rgba(61,149,206,.18);
+  border:1px solid rgba(61,149,206,.4);
+  color:#4aa8d8;
+  transition:all .2s; white-space:nowrap;
+  box-shadow:0 2px 14px rgba(61,149,206,.15);
+}
+.venmo-cta:hover {
+  background:#3d95ce; color:#fff;
+  box-shadow:0 4px 20px rgba(61,149,206,.4);
+  transform:translateY(-1px);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════════════════════════ */
+footer {
+  position:relative; z-index:1;
+  border-top:1px solid var(--border);
+  padding:16px 20px;
+  margin-top:8px;
+}
+.footer-inner {
+  max-width:1300px; margin:0 auto;
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:6px;
+}
+.footer-brand {
+  font-family:var(--font-d);
+  font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--text-3);
+}
+footer span { font-family:var(--font-n); font-size:10px; color:var(--text-3); }
+
+/* ══════════════════════════════════════════════════════════════
+   SCROLL ANIMATION
+══════════════════════════════════════════════════════════════ */
+.anim { opacity:0; transform:translateY(14px); transition:opacity .5s ease, transform .5s ease; }
+.anim.in { opacity:1; transform:translateY(0); }
+
+/* ══════════════════════════════════════════════════════════════
+   KEYFRAMES
+══════════════════════════════════════════════════════════════ */
+@keyframes pulse-bar {
+  0%,100% { opacity:1; }
+  50%      { opacity:.35; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════════════ */
+@media(max-width:660px) {
+  .match-grid { grid-template-columns:1fr; }
+  .nav-acc    { display:none; }
+  .visitor-ct { display:none; }
+  .support-card { flex-direction:column; text-align:center; }
+  .support-icon { margin:0 auto; }
+}
+@media(max-width:480px) {
+  .rb-flow-grid { grid-template-columns:1fr; }
+  .rb-flow-item.span2 { grid-column:1; }
+}
+
+/* Reduced motion */
+@media(prefers-reduced-motion:reduce) {
+  *,.anim { transition:none !important; animation:none !important; }
+}
+  </style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<!-- ══════ NAV ══════ -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="#">
+      <span class="brand-name">Game Sense</span>
+      <span class="brand-year">WC2026</span>
+    </a>
+
+    <div class="nav-acc" id="nav-acc">
+      <!-- Filled by JS -->
+    </div>
+
+    <div class="nav-right">
+      <!-- Visitor counter -->
+      <div class="visitor-ct" id="visitor-ct">
+        <!-- eye icon -->
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span id="visitor-num">—</span>
+      </div>
+
+      <!-- Theme toggle -->
+      <button class="nav-icon-btn" id="theme-btn" aria-label="Toggle theme">
+        <!-- moon icon default -->
+        <svg id="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="icon-sun"  width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+
+      <!-- Venmo — href set by JS from data.venmo -->
+      <a class="venmo-btn" id="venmo-nav" href="#support" aria-label="Support on Venmo">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.32 3C17 5.8 15.9 8.7 15.2 11.6H11.7C11 8.1 9.4 5.1 7.68 3L4 4.5C5.68 8.23 6.72 12.2 6.72 16.5H11.5v.12C11.5 18.5 10.8 20.3 9.5 21.7l4 .3C15.6 20.5 16.8 18.4 17 16v-.5c.2-5.1 1.22-9.9 3-13.6L18.32 3Z"/></svg>
+        Venmo
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════ DASHBOARD ══════ -->
+<div class="dash">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sb-sticky-wrap" id="sidebar">
+
+      <!-- Model performance card -->
+      <div class="sb-card anim" id="stats-card">
+        <div class="sb-head">Model Performance</div>
+        <div class="stats-body">
+          <!-- Arc gauge -->
+          <div class="gauge-wrap">
+            <svg viewBox="0 0 124 72" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <defs>
+                <linearGradient id="gd-arc" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%"   stop-color="#3b82f6"/>
+                  <stop offset="100%" stop-color="#22c55e"/>
+                </linearGradient>
+              </defs>
+              <!-- Track -->
+              <path d="M 17 63 A 45 45 0 0 1 107 63" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="7" stroke-linecap="round"/>
+              <!-- Fill -->
+              <path id="gauge-arc" d="M 17 63 A 45 45 0 0 1 107 63" fill="none" stroke="url(#gd-arc)" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 141.4"/>
+            </svg>
+            <div class="gauge-center">
+              <div class="gauge-pct" id="gauge-pct">0%</div>
+              <div class="gauge-lbl">accuracy</div>
+            </div>
+          </div>
+
+          <div class="stats-row">
+            <span class="stats-label">Markets settled</span>
+            <span class="stats-val" id="sb-settled">—</span>
+          </div>
+          <div class="stats-bar"><div class="stats-bar-fill" id="sb-bar"></div></div>
+          <div class="stats-chips" id="sb-chips"></div>
+        </div>
+      </div>
+
+      <!-- Group standings -->
+      <div class="sb-card anim">
+        <div class="sb-head">Group Standings</div>
+        <div id="sb-groups"></div>
+      </div>
+
+      <!-- Locked patterns -->
+      <div class="sb-card anim">
+        <div class="sb-head">Locked Patterns</div>
+        <div id="sb-patterns"></div>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <div class="main-col">
+
+    <!-- Today / Live -->
+    <div id="sec-live">
+      <div class="sec-hd">
+        <div class="sec-lbl">Today's Picks</div>
+        <div class="sec-rule"></div>
+        <div class="sec-sub" id="live-sub"></div>
+      </div>
+      <div class="match-grid" id="live-grid"></div>
+    </div>
+
+    <!-- Completed -->
+    <div id="sec-done">
+      <div class="sec-hd">
+        <div class="sec-lbl">Completed · Pick vs Result</div>
+        <div class="sec-rule"></div>
+      </div>
+      <div class="match-grid" id="done-grid"></div>
+    </div>
+
+    <!-- Venmo support -->
+    <div id="support">
+      <div class="sec-hd">
+        <div class="sec-lbl">Support</div>
+        <div class="sec-rule"></div>
+      </div>
+      <div class="support-card anim">
+        <div class="support-icon" aria-hidden="true">
+          <!-- Football SVG -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 2a10 10 0 0 1 6.32 2.29L12 8.5 5.68 4.29A10 10 0 0 1 12 2z" fill="currentColor" opacity=".25"/>
+            <path d="M12 8.5l4 2.5-1.5 4.5h-5L8 11z" fill="currentColor" opacity=".35"/>
+          </svg>
+        </div>
+        <div class="support-text">
+          <div class="support-title">Did the model pay you?</div>
+          <div class="support-sub">xG digs, group table math, stress-testing expert consensus — if it paid off, send a coffee.</div>
+        </div>
+        <!-- href set by JS from data.venmo -->
+        <a class="venmo-cta" id="venmo-cta" href="#" target="_blank" rel="noopener" aria-label="Send Venmo payment">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.32 3C17 5.8 15.9 8.7 15.2 11.6H11.7C11 8.1 9.4 5.1 7.68 3L4 4.5C5.68 8.23 6.72 12.2 6.72 16.5H11.5v.12C11.5 18.5 10.8 20.3 9.5 21.7l4 .3C15.6 20.5 16.8 18.4 17 16v-.5c.2-5.1 1.22-9.9 3-13.6L18.32 3Z"/></svg>
+          Send on Venmo
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════ FOOTER ══════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">Game Sense · WC2026</div>
+    <span id="footer-upd"></span>
+    <span>For entertainment. Please gamble responsibly.</span>
+  </div>
+</footer>
+
+<!-- Three.js -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════════════════════════
+   THREE.JS BACKGROUND
+══════════════════════════════════════════════════════════════ */
+(function () {
+  if (!window.THREE) return;
+  const cv  = document.getElementById('bg');
+  const rdr = new THREE.WebGLRenderer({ canvas:cv, alpha:true, antialias:false });
+  rdr.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+  rdr.setSize(innerWidth, innerHeight);
+
+  const scene = new THREE.Scene();
+  const cam   = new THREE.PerspectiveCamera(58, innerWidth/innerHeight, 0.1, 200);
+  cam.position.z = 38;
+
+  const N = 80, pos = new Float32Array(N*3), vel = new Float32Array(N*3);
+  for (let i=0;i<N;i++){
+    pos[i*3]   = (Math.random()-.5)*78; pos[i*3+1] = (Math.random()-.5)*58; pos[i*3+2] = (Math.random()-.5)*22;
+    vel[i*3]   = (Math.random()-.5)*.011; vel[i*3+1] = (Math.random()-.5)*.011; vel[i*3+2] = (Math.random()-.5)*.004;
+  }
+  const ptGeo = new THREE.BufferGeometry();
+  ptGeo.setAttribute('position', new THREE.BufferAttribute(pos.slice(), 3));
+  scene.add(new THREE.Points(ptGeo, new THREE.PointsMaterial({ color:0x3b82f6, size:.2, transparent:true, opacity:.45 })));
+
+  const lBuf = new Float32Array(N*(N-1)/2*6);
+  const lGeo = new THREE.BufferGeometry();
+  lGeo.setAttribute('position', new THREE.BufferAttribute(lBuf, 3));
+  scene.add(new THREE.LineSegments(lGeo, new THREE.LineBasicMaterial({ color:0x22c55e, transparent:true, opacity:.06 })));
+
+  let mx=0, my=0;
+  addEventListener('mousemove', e => { mx=(e.clientX/innerWidth-.5)*4.5; my=-(e.clientY/innerHeight-.5)*3; });
+
+  (function tick(){
+    requestAnimationFrame(tick);
+    const lp = ptGeo.attributes.position.array;
+    for(let i=0;i<N;i++){
+      lp[i*3]+=vel[i*3]; lp[i*3+1]+=vel[i*3+1]; lp[i*3+2]+=vel[i*3+2];
+      if(lp[i*3]>39) lp[i*3]=-39; if(lp[i*3]<-39) lp[i*3]=39;
+      if(lp[i*3+1]>29) lp[i*3+1]=-29; if(lp[i*3+1]<-29) lp[i*3+1]=29;
+    }
+    ptGeo.attributes.position.needsUpdate = true;
+    let k=0; const D2=12.5*12.5;
+    for(let i=0;i<N;i++) for(let j=i+1;j<N;j++){
+      const dx=lp[i*3]-lp[j*3], dy=lp[i*3+1]-lp[j*3+1], dz=lp[i*3+2]-lp[j*3+2];
+      if(dx*dx+dy*dy+dz*dz<D2){
+        lBuf[k++]=lp[i*3]; lBuf[k++]=lp[i*3+1]; lBuf[k++]=lp[i*3+2];
+        lBuf[k++]=lp[j*3]; lBuf[k++]=lp[j*3+1]; lBuf[k++]=lp[j*3+2];
+      }
+    }
+    for(let r=k;r<lBuf.length;r++) lBuf[r]=0;
+    lGeo.attributes.position.needsUpdate = true;
+    lGeo.setDrawRange(0, k/3);
+    cam.position.x += (mx-cam.position.x)*.022;
+    cam.position.y += (my-cam.position.y)*.022;
+    cam.lookAt(0,0,0);
+    rdr.render(scene, cam);
+  })();
+
+  addEventListener('resize', ()=>{
+    cam.aspect=innerWidth/innerHeight; cam.updateProjectionMatrix();
+    rdr.setSize(innerWidth,innerHeight);
+  });
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   THEME TOGGLE
+══════════════════════════════════════════════════════════════ */
+const html = document.documentElement;
+const themeBtn = document.getElementById('theme-btn');
+const moonIcon = document.getElementById('icon-moon');
+const sunIcon  = document.getElementById('icon-sun');
+
+function applyTheme(t) {
+  html.setAttribute('data-theme', t);
+  moonIcon.style.display = t==='dark'  ? '' : 'none';
+  sunIcon.style.display  = t==='light' ? '' : 'none';
+  localStorage.setItem('gs-theme', t);
+}
+applyTheme(localStorage.getItem('gs-theme') || 'dark');
+themeBtn.addEventListener('click', () => applyTheme(html.getAttribute('data-theme')==='dark' ? 'light' : 'dark'));
+
+/* ══════════════════════════════════════════════════════════════
+   VISITOR COUNTER — dual fallback
+══════════════════════════════════════════════════════════════ */
+(async function(){
+  const ct  = document.getElementById('visitor-ct');
+  const num = document.getElementById('visitor-num');
+  async function tryFetch(url) {
+    const r = await fetch(url, { cache:'no-store' });
+    if (!r.ok) throw 0;
+    return r.json();
+  }
+  try {
+    let count;
+    try {
+      const d = await tryFetch('https://api.counterapi.dev/v1/gamesense-wc2026/visits/up');
+      count = d.count;
+    } catch {
+      const d = await tryFetch('https://api.countapi.xyz/hit/gamesense-wc2026-v2/pageview');
+      count = d.value;
+    }
+    if (count) { num.textContent = Number(count).toLocaleString(); ct.style.opacity='1'; }
+  } catch { ct.style.display='none'; }
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   ARC GAUGE ANIMATION
+══════════════════════════════════════════════════════════════ */
+function animateGauge(pct) {
+  const arc   = document.getElementById('gauge-arc');
+  const label = document.getElementById('gauge-pct');
+  const total = Math.PI * 45; // semicircle r=45
+  let start = null;
+  (function step(ts) {
+    if (!start) start = ts;
+    const t    = Math.min((ts-start)/1300, 1);
+    const ease = 1 - Math.pow(1-t, 3);
+    const fill = (pct/100) * total * ease;
+    arc.setAttribute('stroke-dasharray', `${fill} ${total}`);
+    label.textContent = Math.round(pct * ease) + '%';
+    if (t < 1) requestAnimationFrame(step);
+  })(performance.now());
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SCROLL REVEAL
+══════════════════════════════════════════════════════════════ */
+const io = new IntersectionObserver(entries => {
+  entries.forEach((e,i) => {
+    if (e.isIntersecting) { setTimeout(()=>e.target.classList.add('in'), i*55); io.unobserve(e.target); }
+  });
+}, { threshold: 0.06 });
+function observe(el) { el.classList.add('anim'); io.observe(el); return el; }
+
+/* ══════════════════════════════════════════════════════════════
+   SVG ICON HELPERS
+══════════════════════════════════════════════════════════════ */
+const ICONS = {
+  check: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>`,
+  x:     `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+  dash:  `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke-dasharray="3 4"/></svg>`,
+  lock:  `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+};
+
+function sigBars(c) {
+  return `<span class="sig ${c}" title="${c==='H'?'High':c==='M'?'Medium':'Low'} confidence" aria-label="${c} confidence"><i></i><i></i><i></i></span>`;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MARKET NAME MAP
+══════════════════════════════════════════════════════════════ */
+const MKT = {
+  winner:'Result', overUnder:'O/U 2.5', over35:'O/U 3.5',
+  btts:'BTTS', firstHalf:'1st Half', secondHalf:'2nd Half',
+  handicap:'Handicap', scorer1:'Scorer 1', scorer2:'Scorer 2', winToNil:'To Nil',
+};
+
+/* ══════════════════════════════════════════════════════════════
+   BUILD: MATCH CARD
+══════════════════════════════════════════════════════════════ */
+function buildCard(m) {
+  const el = document.createElement('div');
+  el.className = 'mc';
+
+  // Top stripe
+  let stripe = 'soon';
+  if (m.status === 'pending') stripe = 'live';
+  if (m.status === 'completed') {
+    const r = m.score.correct / m.score.total;
+    stripe = r >= .75 ? 'good' : r >= .5 ? 'mixed' : 'bad';
+  }
+  el.innerHTML = `<div class="mc-stripe ${stripe}"></div>`;
+
+  // Header row
+  const lbl = { completed:'Final', pending:'Today', upcoming:'Upcoming' }[m.status];
+  const bc  = { completed:'b-done', pending:'b-live', upcoming:'b-soon' }[m.status];
+  el.innerHTML += `
+    <div class="mc-hdr">
+      <span class="mc-date">${m.date}</span>
+      <span class="mc-badge ${bc}">${lbl}</span>
+    </div>`;
+
+  // Teams + score/ko
+  let scoreHTML;
+  if (m.status === 'completed') {
+    scoreHTML = `<div class="mc-result-score">${m.result.home}<span class="sc-sep">–</span>${m.result.away}</div>`;
+  } else if (m.status === 'pending') {
+    scoreHTML = `<div class="mc-ko"><div class="ko-t">${m.kickoff}</div><div class="ko-l">Live Soon</div></div>`;
+  } else {
+    scoreHTML = `<div class="mc-ko"><div class="ko-t" style="font-size:13px;color:var(--text-3)">KO ${m.kickoff}</div></div>`;
+  }
+  el.innerHTML += `
+    <div class="mc-matchup">
+      <div class="mc-team"><span class="t-flag">${m.homeTeam.flag}</span><span class="t-name">${m.homeTeam.name}</span></div>
+      ${scoreHTML}
+      <div class="mc-team away"><span class="t-flag">${m.awayTeam.flag}</span><span class="t-name">${m.awayTeam.name}</span></div>
+    </div>`;
+
+  // Predictions table
+  const hasResults = Object.values(m.predictions).some(p => p.result);
+  const rows = Object.entries(m.predictions).map(([key, p]) => {
+    const winClass  = p.correct === null ? '' : p.correct ? 'p-win' : 'p-lose';
+    const iconClass = p.correct === null ? 'icon-pend' : p.correct ? 'icon-win' : 'icon-lose';
+    const iconSVG   = p.correct === null ? ICONS.dash : p.correct ? ICONS.check : ICONS.x;
+    const callHTML  = p.call.replace('⭐', '<span class="star">★</span>');
+    const confBars  = p.conf ? sigBars(p.conf) : '';
+    const resCell   = hasResults
+      ? `<div class="p-result">${p.result || '<span style="color:var(--text-3)">—</span>'}</div>`
+      : '';
+    return `
+      <div class="pred-row ${winClass}">
+        <div class="p-mkt">${MKT[key] || key}</div>
+        <div class="p-pick">${callHTML}</div>
+        <div class="pth-conf">${confBars}</div>
+        ${resCell}
+        <div class="p-icon ${iconClass}">${iconSVG}</div>
+      </div>`;
+  }).join('');
+
+  el.innerHTML += `
+    <div class="mc-preds">
+      <div class="preds-th">
+        <div class="pth pth-mkt">Market</div>
+        <div class="pth pth-pick">Pick</div>
+        <div class="pth pth-conf">Conf</div>
+        ${hasResults ? '<div class="pth pth-res">Result</div>' : ''}
+        <div class="pth pth-icon"></div>
+      </div>
+      ${rows}
+    </div>`;
+
+  // Key insight
+  el.innerHTML += `<div class="mc-insight">${m.keyInsight}</div>`;
+
+  // Score bar (completed only)
+  if (m.status === 'completed') {
+    const pct = Math.round(m.score.correct / m.score.total * 100);
+    const col = pct>=75 ? 'var(--green)' : pct>=50 ? 'var(--amber)' : 'var(--red)';
+    el.innerHTML += `
+      <div class="mc-scorebar">
+        <span class="mc-sb-lbl">Markets correct</span>
+        <span class="mc-sb-frac" style="color:${col}">${m.score.correct}/${m.score.total}</span>
+      </div>`;
+  }
+
+  // Full analysis expandable
+  if (m.report) {
+    const rid = 'r-' + m.id;
+    const flowItems = `
+      <div class="rb-flow-item"><div class="rb-flow-key">${m.homeTeam.name}</div><div class="rb-flow-val">${m.report.gameFlow.home}</div></div>
+      <div class="rb-flow-item"><div class="rb-flow-key">${m.awayTeam.name}</div><div class="rb-flow-val">${m.report.gameFlow.away}</div></div>
+      <div class="rb-flow-item span2"><div class="rb-flow-key">Scoring Mechanisms</div><div class="rb-flow-val">${m.report.gameFlow.mechanism}</div></div>
+      <div class="rb-flow-item span2"><div class="rb-flow-key">Game Opens When</div><div class="rb-flow-val">${m.report.gameFlow.trigger}</div></div>`;
+    const stressItems = m.report.stressTest.map(f=>`<li>${f}</li>`).join('');
+
+    el.innerHTML += `
+      <button class="report-toggle" onclick="toggleReport('${rid}',this)" aria-expanded="false" aria-controls="${rid}">
+        <span class="rt-label">Full Analysis</span>
+        <span class="rt-caret" id="${rid}-c" aria-hidden="true">▾</span>
+      </button>
+      <div class="report-body" id="${rid}" role="region">
+        <div class="rb-inner">
+          <div class="rb-block">
+            <div class="rb-block-title">Consensus Cluster</div>
+            <div class="rb-text">${m.report.consensus}</div>
+          </div>
+          <div class="rb-block">
+            <div class="rb-block-title">Game Flow Map</div>
+            <div class="rb-flow-grid">${flowItems}</div>
+          </div>
+          <div class="rb-block">
+            <div class="rb-block-title">Stress Test — Flaws Found</div>
+            <ul class="rb-stress-list">${stressItems}</ul>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  observe(el);
+  return el;
+}
+
+function toggleReport(id, btn) {
+  const body  = document.getElementById(id);
+  const caret = document.getElementById(id+'-c');
+  const open  = body.classList.toggle('open');
+  caret.classList.toggle('open', open);
+  btn.setAttribute('aria-expanded', String(open));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BUILD: SIDEBAR GROUP
+══════════════════════════════════════════════════════════════ */
+function buildMiniGroup(g) {
+  const el = document.createElement('div');
+  el.className = 'mg-group-block';
+  const names = g.teams.map(t => t.name.split(' ')[0]).join(' · ');
+  el.innerHTML = `
+    <div class="mg-title">
+      <div class="mg-letter">${g.id}</div>
+      <div class="mg-teams">${names}</div>
+    </div>
+    <table class="mgt" aria-label="Group ${g.id} standings">
+      <tbody>
+        ${g.teams.map((t,i) => {
+          const gd  = t.gf - t.ga;
+          const gdC = gd>0 ? 'var(--green)' : gd<0 ? 'var(--red)' : 'var(--text-3)';
+          const qdot = t.qualified ? '<span class="qdot" title="Qualified"></span>' : '';
+          return `<tr class="${t.qualified?'mgt-q':''}">
+            <td>
+              <div class="mgt-row">
+                <span class="mgt-pos">${i+1}</span>
+                <span class="mgt-flag">${t.flag}</span>
+                <span class="mgt-name">${t.name}${qdot}</span>
+              </div>
+            </td>
+            <td><span class="mgt-gd" style="color:${gdC}">${gd>0?'+':''}${gd}</span></td>
+            <td><span class="mgt-pts">${t.pts}</span></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+  return el;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BUILD: SIDEBAR PATTERN
+══════════════════════════════════════════════════════════════ */
+function buildPatItem(p) {
+  const el = document.createElement('div');
+  el.className = 'pat-item';
+  const shortDetail = p.detail.length > 88 ? p.detail.slice(0,85) + '…' : p.detail;
+  el.innerHTML = `
+    <div class="pat-id">0${p.id}</div>
+    <div class="pat-lock-icon">${ICONS.lock}</div>
+    <div class="pat-text">
+      <div class="pat-title">${p.title}</div>
+      <div class="pat-desc">${shortDetail}</div>
+    </div>`;
+  return el;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════════════ */
+(function init() {
+  const d = WC_DATA;
+  const { marketsCorrect:c, marketsWrong:w } = d.modelStats;
+  const pct = Math.round(c/(c+w)*100);
+
+  // Venmo links
+  if (d.venmo) {
+    const href = `https://venmo.com/u/${d.venmo}`;
+    document.getElementById('venmo-nav').href = '#support';
+    document.getElementById('venmo-nav').onclick = null;
+    document.getElementById('venmo-cta').href = href;
+    document.getElementById('venmo-nav').href = href;
+    document.getElementById('venmo-nav').target = '_blank';
+    document.getElementById('venmo-nav').rel = 'noopener';
+  }
+
+  // Footer
+  document.getElementById('footer-upd').textContent = 'Updated: ' + d.lastUpdated;
+
+  // Nav accuracy
+  document.getElementById('nav-acc').innerHTML = `
+    <span class="nav-acc-rate">${pct}%</span>
+    <span class="nav-acc-sep"></span>
+    <span class="nav-acc-detail">${c}/${c+w} markets · ${d.modelStats.gamesCompleted} games</span>`;
+
+  // Sidebar stats (animate after short delay)
+  document.getElementById('sb-settled').textContent = `${c+w} markets`;
+  document.getElementById('sb-chips').innerHTML = `
+    <span class="chip chip-g">${c} correct</span>
+    <span class="chip chip-r">${w} wrong</span>
+    <span class="chip chip-b">${d.modelStats.gamesCompleted} games</span>`;
+  setTimeout(() => {
+    document.getElementById('sb-bar').style.width = pct + '%';
+    animateGauge(pct);
+  }, 400);
+
+  // Sidebar groups
+  const sbG = document.getElementById('sb-groups');
+  d.groups.forEach(g => sbG.appendChild(buildMiniGroup(g)));
+
+  // Sidebar patterns
+  const sbP = document.getElementById('sb-patterns');
+  d.patterns.forEach(p => sbP.appendChild(buildPatItem(p)));
+
+  // Matches
+  const live = d.matches.filter(m => m.status !== 'completed');
+  const done = d.matches.filter(m => m.status === 'completed').reverse();
+
+  if (!live.length) {
+    document.getElementById('sec-live').style.display = 'none';
+  } else {
+    document.getElementById('live-sub').textContent = live.length + ' match' + (live.length>1?'es':'');
+    live.forEach(m => document.getElementById('live-grid').appendChild(buildCard(m)));
+  }
+  done.forEach(m => document.getElementById('done-grid').appendChild(buildCard(m)));
+
+  // Observe sidebar cards
+  document.querySelectorAll('.sb-card, .support-card').forEach(el => io.observe(el));
+})();
+</script>
+</body>
+</html>
