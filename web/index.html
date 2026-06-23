@@ -302,6 +302,20 @@ table.mgt td:first-child { text-align:left; }
   margin-left:4px; vertical-align:middle;
 }
 
+/* Confidence accuracy breakdown */
+.conf-acc-row {
+  display:flex; align-items:center; gap:8px;
+  padding:5px 14px;
+  border-bottom:1px solid rgba(255,255,255,.025);
+}
+[data-theme="light"] .conf-acc-row { border-bottom-color:rgba(0,0,0,.04); }
+.conf-acc-row:last-child { border-bottom:none; }
+.conf-acc-bar-wrap {
+  flex:1; height:3px; background:var(--border); border-radius:2px; overflow:hidden;
+}
+.conf-acc-bar { height:100%; border-radius:2px; transition:width 1s ease; }
+.conf-acc-frac { font-family:var(--font-n); font-size:11px; font-weight:600; min-width:28px; text-align:right; }
+
 /* Pattern list */
 .pat-item {
   display:flex; align-items:flex-start; gap:10px;
@@ -454,9 +468,15 @@ table.mgt td:first-child { text-align:left; }
   font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
   padding:2px 6px; border-radius:4px; white-space:nowrap; display:inline-block;
 }
-.cb-h { background:var(--green-dim); color:var(--green); }
-.cb-m { background:var(--amber-dim); color:var(--amber); }
-.cb-l { background:var(--border);    color:var(--text-3); }
+.cb-xh { background:rgba(34,197,94,.25);  color:#16a34a; box-shadow:0 0 6px rgba(34,197,94,.2); }
+.cb-h  { background:var(--green-dim);     color:var(--green); }
+.cb-mh { background:rgba(34,197,94,.08);  color:#86efac; }
+.cb-m  { background:var(--amber-dim);     color:var(--amber); }
+.cb-ml { background:rgba(245,158,11,.08); color:#fcd34d; }
+.cb-l  { background:var(--border);        color:var(--text-3); }
+[data-theme="light"] .cb-xh { background:rgba(22,163,74,.18); color:#15803d; box-shadow:none; }
+[data-theme="light"] .cb-mh { background:rgba(34,197,94,.1);  color:#16a34a; }
+[data-theme="light"] .cb-ml { background:rgba(245,158,11,.1); color:#d97706; }
 
 .p-result { flex:1; font-size:11px; color:var(--text-2); }
 .p-icon {
@@ -753,6 +773,12 @@ footer span { font-family:var(--font-n); font-size:10px; color:var(--text-3); }
         </div>
       </div>
 
+      <!-- Confidence accuracy breakdown -->
+      <div class="sb-card anim" id="sb-conf-section" style="display:none">
+        <div class="sb-head">Accuracy by Confidence</div>
+        <div id="sb-conf-breakdown"></div>
+      </div>
+
       <!-- Group standings -->
       <div class="sb-card anim">
         <div class="sb-head">Group Standings</div>
@@ -978,11 +1004,12 @@ const ICONS = {
   lock:  `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
 };
 
+const CONF_LABELS = { XH:'MAX', H:'HIGH', MH:'MED-HI', M:'MED', ML:'MED-LO', L:'LOW' };
+const CONF_CSS    = { XH:'cb-xh', H:'cb-h', MH:'cb-mh', M:'cb-m', ML:'cb-ml', L:'cb-l' };
+
 function confBadge(c) {
-  const labels = { H:'HIGH', M:'MED', L:'LOW' };
-  const cls    = { H:'cb-h', M:'cb-m', L:'cb-l' };
-  if (!c || !labels[c]) return '';
-  return `<span class="cbadge ${cls[c]}" aria-label="${labels[c]} confidence">${labels[c]}</span>`;
+  if (!c || !CONF_LABELS[c]) return '';
+  return `<span class="cbadge ${CONF_CSS[c]}" aria-label="${CONF_LABELS[c]} confidence">${CONF_LABELS[c]}</span>`;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -997,7 +1024,7 @@ const MKT = {
 /* ══════════════════════════════════════════════════════════════
    BUILD: PREDICTIONS ROWS (shared, sorted by confidence)
 ══════════════════════════════════════════════════════════════ */
-const CONF_ORDER = { H: 3, M: 2, L: 1 };
+const CONF_ORDER = { XH: 6, H: 5, MH: 4, M: 3, ML: 2, L: 1 };
 
 function buildPredRows(m) {
   const hasResults = Object.values(m.predictions).some(p => p.result);
@@ -1254,6 +1281,39 @@ function buildPatItem(p) {
     <span class="nav-acc-rate">${pct}%</span>
     <span class="nav-acc-sep"></span>
     <span class="nav-acc-detail">${c}/${c+w} markets · ${d.modelStats.gamesCompleted} games</span>`;
+
+  // Per-confidence accuracy — computed live from completed matches
+  const confBuckets = {};
+  d.matches.filter(m => m.status === 'completed').forEach(m => {
+    Object.values(m.predictions).forEach(p => {
+      if (p.correct === null || !p.conf) return;
+      if (!confBuckets[p.conf]) confBuckets[p.conf] = { ok: 0, tot: 0 };
+      confBuckets[p.conf].tot++;
+      if (p.correct) confBuckets[p.conf].ok++;
+    });
+  });
+
+  // Build confidence breakdown rows (high tiers first)
+  const confRows = ['XH','H','MH','M','ML','L']
+    .filter(k => confBuckets[k])
+    .map(k => {
+      const b   = confBuckets[k];
+      const pct = Math.round(b.ok / b.tot * 100);
+      const col = pct >= 75 ? 'var(--green)' : pct >= 50 ? 'var(--amber)' : 'var(--red)';
+      return `
+        <div class="conf-acc-row">
+          <span class="cbadge ${CONF_CSS[k]}">${CONF_LABELS[k]}</span>
+          <div class="conf-acc-bar-wrap">
+            <div class="conf-acc-bar" style="width:${pct}%;background:${col}"></div>
+          </div>
+          <span class="conf-acc-frac" style="color:${col}">${b.ok}/${b.tot}</span>
+        </div>`;
+    }).join('');
+
+  if (confRows) {
+    document.getElementById('sb-conf-breakdown').innerHTML = confRows;
+    document.getElementById('sb-conf-section').style.display = '';
+  }
 
   // Sidebar stats (animate after short delay)
   document.getElementById('sb-settled').textContent = `${c+w} markets`;

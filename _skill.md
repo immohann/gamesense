@@ -317,11 +317,14 @@ The split between experts = where value lives.
 Finding a flaw and still backing the consensus is the most expensive mistake
 in soccer prediction. If you find it, act on it.
 
-**Confidence calibration:**
-- High = game flow map + stats + stress test all point same direction
-- Medium = game flow map points one way but stats or stress test raise doubts
-- Low = meaningful uncertainty remains after full analysis
-- Avoid = stress test found real flaw with no resolution
+**Confidence calibration (6 levels — use the data code in data.js):**
+- **MAX** `XH` — Locked pattern confirmed + all three factors agree + cluster unanimous. Near-certainty. Use sparingly.
+- **HIGH** `H` — Game flow map + stats + stress test all point the same direction. No unresolved doubts.
+- **MED-HI** `MH` — Game flow map is clear, but one minor factor (a stat or a single stress test item) raises a small doubt. Still a strong call.
+- **MED** `M` — Game flow points one way, but stats or stress test raise a real, unresolved doubt. Backing it but with reservation.
+- **MED-LO** `ML` — More doubt than certainty after analysis. Lean only — not a strong bet.
+- **LOW** `L` — Meaningful uncertainty remains after the full analysis. Flag as LOW, do not star.
+- **Avoid** — Stress test found a real flaw with no resolution. Do not assign a confidence level — mark as "Avoid" in the market table.
 
 **Respect the underdog's game plan.**
 In tournament soccer, disciplined defending beats paper quality regularly.
