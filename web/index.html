@@ -101,12 +101,12 @@ button { cursor:pointer; font-family:inherit; border:none; background:none; }
 ══════════════════════════════════════════════════════════════ */
 #nav {
   position:fixed; top:0; left:0; right:0; z-index:200;
-  background:rgba(2,6,23,.78);
+  background:rgba(2,6,23,.96);
   backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur);
   border-bottom:1px solid var(--border);
   transition:background .3s;
 }
-[data-theme="light"] #nav { background:rgba(237,242,252,.88); }
+[data-theme="light"] #nav { background:rgba(237,242,252,.97); }
 
 .nav-inner {
   max-width:1300px; margin:0 auto; padding:0 20px;
@@ -149,7 +149,6 @@ button { cursor:pointer; font-family:inherit; border:none; background:none; }
   display:flex; align-items:center; gap:5px;
   font-family:var(--font-n);
   font-size:11px; color:var(--text-3);
-  opacity:0; transition:opacity .5s;
 }
 .visitor-ct svg { opacity:.5; }
 .nav-icon-btn {
@@ -689,11 +688,58 @@ footer span { font-family:var(--font-n); font-size:10px; color:var(--text-3); }
 }
 
 /* ══════════════════════════════════════════════════════════════
+   BURGER MENU
+══════════════════════════════════════════════════════════════ */
+.nav-burger {
+  display:none;
+  width:34px; height:34px; border-radius:8px;
+  background:var(--border); color:var(--text-2);
+  align-items:center; justify-content:center;
+  flex-shrink:0; cursor:pointer;
+  transition:background .2s,color .2s;
+}
+.nav-burger:hover { background:var(--blue-dim); color:var(--blue); }
+.nav-burger svg { transition:transform .2s; }
+.nav-burger.open svg { transform:rotate(90deg); }
+
+.nav-mobile-panel {
+  display:none;
+  position:fixed; top:62px; left:0; right:0; z-index:190;
+  background:rgba(2,6,23,.99);
+  border-bottom:1px solid var(--border);
+  padding:14px 20px 18px;
+  flex-direction:column; gap:14px;
+  backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur);
+}
+[data-theme="light"] .nav-mobile-panel { background:rgba(237,242,252,.99); }
+.nav-mobile-panel.open { display:flex; }
+
+.nmp-row {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.nmp-acc {
+  display:flex; align-items:center; gap:10px;
+}
+.nmp-acc-rate {
+  font-family:var(--font-n); font-size:18px; font-weight:600;
+  background:var(--gd-alt);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.nmp-acc-detail { font-size:11px; color:var(--text-3); }
+.nmp-btns { display:flex; align-items:center; gap:8px; }
+.nmp-visitors {
+  display:flex; align-items:center; gap:5px;
+  font-family:var(--font-n); font-size:11px; color:var(--text-3);
+}
+
+/* ══════════════════════════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════════════════════════ */
 @media(max-width:660px) {
   .match-grid { grid-template-columns:1fr; }
   .nav-acc    { display:none; }
+  .nav-right  { display:none; }
+  .nav-burger { display:flex; }
   .support-card { flex-direction:column; text-align:center; }
   .support-icon { margin:0 auto; }
 }
@@ -744,9 +790,50 @@ footer span { font-family:var(--font-n); font-size:10px; color:var(--text-3); }
         <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.32 3C17 5.8 15.9 8.7 15.2 11.6H11.7C11 8.1 9.4 5.1 7.68 3L4 4.5C5.68 8.23 6.72 12.2 6.72 16.5H11.5v.12C11.5 18.5 10.8 20.3 9.5 21.7l4 .3C15.6 20.5 16.8 18.4 17 16v-.5c.2-5.1 1.22-9.9 3-13.6L18.32 3Z"/></svg>
         Venmo
       </a>
+
+      <!-- Burger — mobile only -->
+      <button class="nav-burger" id="burger-btn" aria-label="Open menu" onclick="toggleMobileMenu()">
+        <svg id="burger-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+        <svg id="close-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="display:none" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
     </div>
   </div>
 </nav>
+
+<!-- Mobile nav panel -->
+<div class="nav-mobile-panel" id="nav-mobile-panel">
+  <div class="nmp-row">
+    <div class="nmp-acc">
+      <span class="nmp-acc-rate" id="nmp-rate">—%</span>
+      <span class="nmp-acc-detail" id="nmp-detail">HIGH picks</span>
+    </div>
+    <div class="nmp-btns">
+      <!-- Theme toggle -->
+      <button class="nav-icon-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg id="nmp-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="nmp-sun"  width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <!-- Venmo -->
+      <a class="venmo-btn" onclick="openVenmoModal();closeMobileMenu();" style="cursor:pointer">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.32 3C17 5.8 15.9 8.7 15.2 11.6H11.7C11 8.1 9.4 5.1 7.68 3L4 4.5C5.68 8.23 6.72 12.2 6.72 16.5H11.5v.12C11.5 18.5 10.8 20.3 9.5 21.7l4 .3C15.6 20.5 16.8 18.4 17 16v-.5c.2-5.1 1.22-9.9 3-13.6L18.32 3Z"/></svg>
+        Buy me a beer
+      </a>
+    </div>
+  </div>
+  <div class="nmp-row">
+    <div class="nmp-visitors" id="nmp-visitors">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span id="nmp-visitor-num">—</span> visitors
+    </div>
+  </div>
+</div>
 
 <!-- ══════ DASHBOARD ══════ -->
 <div class="dash">
@@ -959,10 +1046,16 @@ function applyTheme(t) {
   html.setAttribute('data-theme', t);
   moonIcon.style.display = t==='dark'  ? '' : 'none';
   sunIcon.style.display  = t==='light' ? '' : 'none';
+  // sync mobile panel icons
+  const nm = document.getElementById('nmp-moon');
+  const ns = document.getElementById('nmp-sun');
+  if (nm) nm.style.display = t==='dark'  ? '' : 'none';
+  if (ns) ns.style.display = t==='light' ? '' : 'none';
   localStorage.setItem('gs-theme', t);
 }
+function toggleTheme() { applyTheme(html.getAttribute('data-theme')==='dark' ? 'light' : 'dark'); }
 applyTheme(localStorage.getItem('gs-theme') || 'dark');
-themeBtn.addEventListener('click', () => applyTheme(html.getAttribute('data-theme')==='dark' ? 'light' : 'dark'));
+themeBtn.addEventListener('click', toggleTheme);
 
 /* ══════════════════════════════════════════════════════════════
    VISITOR COUNTER — dual fallback
@@ -984,8 +1077,13 @@ themeBtn.addEventListener('click', () => applyTheme(html.getAttribute('data-them
       const d = await tryFetch('https://api.countapi.xyz/hit/gamesense-wc2026-v2/pageview');
       count = d.value;
     }
-    if (count) { num.textContent = Number(count).toLocaleString(); ct.style.opacity='1'; }
-  } catch { ct.style.display='none'; }
+    if (count) {
+      const fmt = Number(count).toLocaleString();
+      num.textContent = fmt;
+      const nmp = document.getElementById('nmp-visitor-num');
+      if (nmp) nmp.textContent = fmt;
+    }
+  } catch {}
 })();
 
 /* ══════════════════════════════════════════════════════════════
@@ -1237,6 +1335,24 @@ function buildCard(m) {
   return el;
 }
 
+/* ── Mobile menu ── */
+function toggleMobileMenu() {
+  const panel  = document.getElementById('nav-mobile-panel');
+  const btn    = document.getElementById('burger-btn');
+  const open   = panel.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  document.getElementById('burger-icon').style.display = open ? 'none' : '';
+  document.getElementById('close-icon').style.display  = open ? ''     : 'none';
+}
+function closeMobileMenu() {
+  const panel = document.getElementById('nav-mobile-panel');
+  const btn   = document.getElementById('burger-btn');
+  panel.classList.remove('open');
+  btn.classList.remove('open');
+  document.getElementById('burger-icon').style.display = '';
+  document.getElementById('close-icon').style.display  = 'none';
+}
+
 /* ── Venmo modal ── */
 function openVenmoModal() {
   document.getElementById('venmo-modal').classList.add('open');
@@ -1307,6 +1423,10 @@ function toggleReport(id, btn) {
     <span class="nav-acc-rate" title="Accuracy on HIGH confidence picks only">${highPct}%</span>
     <span class="nav-acc-sep"></span>
     <span class="nav-acc-detail" title="HIGH confidence picks only (${highFrac})">${highFrac} HIGH · ${d.modelStats.gamesCompleted} games</span>`;
+
+  // Mobile panel accuracy
+  document.getElementById('nmp-rate').textContent   = `${highPct}%`;
+  document.getElementById('nmp-detail').textContent = `${highFrac} HIGH confidence · ${d.modelStats.gamesCompleted} games`;
 
   // Build confidence breakdown rows (high tiers first)
   const confRows = ['XH','H','MH','M','ML','L']
