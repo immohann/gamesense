@@ -558,21 +558,20 @@ table.mgt td:first-child { text-align:left; }
 /* ── Full Analysis expandable ── */
 .report-toggle {
   display:flex; align-items:center; justify-content:space-between;
-  padding:9px 14px;
-  border-top:1px solid var(--border);
-  background:rgba(0,0,0,.12);
+  padding:10px 14px;
+  border-top:1px solid rgba(34,197,94,.2);
+  background:rgba(34,197,94,.07);
   cursor:pointer; transition:background .15s;
   width:100%; text-align:left;
 }
-[data-theme="light"] .report-toggle { background:rgba(0,0,0,.03); }
-.report-toggle:hover { background:var(--blue-dim); }
-.rt-label { font-family:var(--font-d); font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--text-3); }
-.report-toggle:hover .rt-label { color:var(--blue); }
-.rt-caret { color:var(--text-3); transition:transform .25s; font-size:11px; }
+[data-theme="light"] .report-toggle { background:rgba(34,197,94,.06); border-top-color:rgba(34,197,94,.2); }
+.report-toggle:hover { background:rgba(34,197,94,.14); }
+.rt-label { font-family:var(--font-d); font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--green); }
+.rt-caret { color:var(--green); transition:transform .25s; font-size:11px; opacity:.7; }
 .rt-caret.open { transform:rotate(180deg); }
 
-.report-body { max-height:0; overflow:hidden; transition:max-height .38s ease; }
-.report-body.open { max-height:640px; border-top:1px solid var(--border); }
+.report-body { max-height:0; overflow:hidden; transition:max-height .45s ease; }
+.report-body.open { max-height:9999px; overflow:visible; border-top:1px solid rgba(34,197,94,.15); }
 
 .rb-inner { padding:14px; display:flex; flex-direction:column; gap:12px; }
 
@@ -605,6 +604,9 @@ table.mgt td:first-child { text-align:left; }
   content:'→'; color:var(--amber); flex-shrink:0;
   font-size:10px; margin-top:1px;
 }
+
+/* All-picks table inside Full Analysis — bleed to card edges */
+.rb-block .mc-preds { margin:0 -14px; border-radius:0; }
 
 /* ══════════════════════════════════════════════════════════════
    VENMO SUPPORT SECTION
@@ -1141,6 +1143,21 @@ function buildCardBody(m) {
       <div class="rb-flow-item span2"><div class="rb-flow-key">Scoring Mechanisms</div><div class="rb-flow-val">${m.report.gameFlow.mechanism}</div></div>
       <div class="rb-flow-item span2"><div class="rb-flow-key">Game Opens When</div><div class="rb-flow-val">${m.report.gameFlow.trigger}</div></div>`;
     const stressItems = m.report.stressTest.map(f=>`<li>${f}</li>`).join('');
+
+    // All picks (no filter) for full analysis section
+    const { rows: allRows, hasResults: allHasResults } = buildPredRows(m, false);
+    const allPicksTable = `
+      <div class="mc-preds" style="border-top:none">
+        <div class="preds-th">
+          <div class="pth pth-mkt">Market</div>
+          <div class="pth pth-pick">Pick</div>
+          <div class="pth pth-conf">Conf</div>
+          ${allHasResults ? '<div class="pth pth-res">Result</div>' : ''}
+          <div class="pth pth-icon"></div>
+        </div>
+        ${allRows}
+      </div>`;
+
     html += `
       <button class="report-toggle" onclick="toggleReport('${rid}',this)" aria-expanded="false" aria-controls="${rid}">
         <span class="rt-label">Full Analysis</span>
@@ -1148,6 +1165,10 @@ function buildCardBody(m) {
       </button>
       <div class="report-body" id="${rid}" role="region">
         <div class="rb-inner">
+          <div class="rb-block">
+            <div class="rb-block-title">All Picks — Every Market</div>
+            ${allPicksTable}
+          </div>
           <div class="rb-block">
             <div class="rb-block-title">Consensus Cluster</div>
             <div class="rb-text">${m.report.consensus}</div>
