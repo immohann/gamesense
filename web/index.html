@@ -180,7 +180,7 @@ button { cursor:pointer; font-family:inherit; border:none; background:none; }
   max-width:1300px; margin:0 auto;
   padding:70px 20px 64px;
   display:grid;
-  grid-template-columns:268px 1fr;
+  grid-template-columns:288px 1fr;
   gap:20px;
   align-items:start;
 }
@@ -197,9 +197,16 @@ button { cursor:pointer; font-family:inherit; border:none; background:none; }
   position:sticky; top:62px;
   display:flex; flex-direction:column; gap:12px;
   max-height:calc(100vh - 80px);
-  overflow-y:auto; scrollbar-width:none;
+  overflow-y:auto;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.12) transparent;
+  padding-right:3px;
 }
-.sb-sticky-wrap::-webkit-scrollbar { display:none; }
+.sb-sticky-wrap::-webkit-scrollbar { width:3px; }
+.sb-sticky-wrap::-webkit-scrollbar-track { background:transparent; }
+.sb-sticky-wrap::-webkit-scrollbar-thumb { background:rgba(255,255,255,.15); border-radius:2px; }
+[data-theme="light"] .sb-sticky-wrap { scrollbar-color:rgba(0,0,0,.18) transparent; }
+[data-theme="light"] .sb-sticky-wrap::-webkit-scrollbar-thumb { background:rgba(0,0,0,.2); }
 
 /* Sidebar base card */
 .sb-card {
@@ -657,6 +664,13 @@ footer {
   color:var(--text-3);
 }
 footer span { font-family:var(--font-n); font-size:10px; color:var(--text-3); }
+.footer-disclaimer {
+  max-width:1300px; margin:10px auto 0;
+  font-family:var(--font-b); font-size:10px; color:var(--text-3);
+  line-height:1.6; padding:10px 0 2px;
+  border-top:1px solid var(--border);
+  opacity:.75;
+}
 
 /* ══════════════════════════════════════════════════════════════
    SCROLL ANIMATION
@@ -759,8 +773,8 @@ footer span { font-family:var(--font-n); font-size:10px; color:var(--text-3); }
               <path id="gauge-arc" d="M 17 63 A 45 45 0 0 1 107 63" fill="none" stroke="url(#gd-arc)" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 141.4"/>
             </svg>
             <div class="gauge-center">
-              <div class="gauge-pct" id="gauge-pct">0%</div>
-              <div class="gauge-lbl">accuracy</div>
+              <div class="gauge-pct" id="gauge-pct" title="Accuracy on HIGH confidence picks only — excludes MED and LOW picks">0%</div>
+              <div class="gauge-lbl">HIGH conf</div>
             </div>
           </div>
 
@@ -851,7 +865,9 @@ footer span { font-family:var(--font-n); font-size:10px; color:var(--text-3); }
   <div class="footer-inner">
     <div class="footer-brand">Game Sense · WC2026</div>
     <span id="footer-upd"></span>
-    <span>For entertainment. Please gamble responsibly.</span>
+  </div>
+  <div class="footer-disclaimer">
+    Game Sense provides statistical analysis for informational and entertainment purposes only. Nothing published here constitutes financial, betting, or investment advice of any kind. All model outputs are generated from publicly available data and are for informational use only. Past model accuracy is not indicative of future results. Gambling involves significant financial risk — please gamble responsibly. You must be 18 years of age or older, or of the legal gambling age in your jurisdiction, to engage in sports wagering.
   </div>
 </footer>
 
@@ -1026,10 +1042,14 @@ const MKT = {
 ══════════════════════════════════════════════════════════════ */
 const CONF_ORDER = { XH: 6, H: 5, MH: 4, M: 3, ML: 2, L: 1 };
 
-function buildPredRows(m) {
+function buildPredRows(m, filterHigh) {
   const hasResults = Object.values(m.predictions).some(p => p.result);
-  const sorted = Object.entries(m.predictions)
+  let sorted = Object.entries(m.predictions)
     .sort(([,a],[,b]) => (CONF_ORDER[b.conf]||0) - (CONF_ORDER[a.conf]||0));
+
+  if (filterHigh) {
+    sorted = sorted.filter(([,p]) => p.conf === 'H' || p.conf === 'XH');
+  }
 
   const rows = sorted.map(([key, p]) => {
     const winClass  = p.correct === null ? '' : p.correct ? 'p-win' : 'p-lose';
@@ -1040,8 +1060,11 @@ function buildPredRows(m) {
     const resCell   = hasResults
       ? `<div class="p-result">${p.result || '<span style="color:var(--text-3)">—</span>'}</div>`
       : '';
+    const hoverTitle = filterHigh && p.correct !== null
+      ? ` title="${(MKT[key]||key)}: ${p.call.replace('⭐','').trim()} → ${p.correct ? '✓ Hit' : '✗ Miss'}${p.result ? ' · ' + p.result : ''}"`
+      : '';
     return `
-      <div class="pred-row ${winClass}">
+      <div class="pred-row ${winClass}"${hoverTitle}>
         <div class="p-mkt">${MKT[key] || key}</div>
         <div class="p-pick">${callHTML}</div>
         <div class="pth-conf">${badge}</div>
@@ -1069,7 +1092,8 @@ function buildCardBody(m) {
     scoreHTML = `<div class="mc-ko"><div class="ko-t" style="font-size:13px;color:var(--text-3)">KO ${m.kickoff}</div></div>`;
   }
 
-  const { rows, hasResults } = buildPredRows(m);
+  const isCompleted = m.status === 'completed';
+  const { rows, hasResults } = buildPredRows(m, isCompleted);
 
   let html = `
     <div class="mc-hdr">
@@ -1084,12 +1108,13 @@ function buildCardBody(m) {
     <div class="mc-preds">
       <div class="preds-th">
         <div class="pth pth-mkt">Market</div>
-        <div class="pth pth-pick">Pick</div>
+        <div class="pth pth-pick">Pick vs Result</div>
         <div class="pth pth-conf">Conf</div>
         ${hasResults ? '<div class="pth pth-res">Result</div>' : ''}
         <div class="pth pth-icon"></div>
       </div>
       ${rows}
+      ${isCompleted ? '<div style="padding:4px 14px 5px;font-size:9px;color:var(--text-3);letter-spacing:.06em">HIGH confidence picks only · hover for detail</div>' : ''}
     </div>
     <div class="mc-insight">${m.keyInsight}</div>`;
 
@@ -1276,12 +1301,6 @@ function buildPatItem(p) {
   // Footer
   document.getElementById('footer-upd').textContent = 'Updated: ' + d.lastUpdated;
 
-  // Nav accuracy
-  document.getElementById('nav-acc').innerHTML = `
-    <span class="nav-acc-rate">${pct}%</span>
-    <span class="nav-acc-sep"></span>
-    <span class="nav-acc-detail">${c}/${c+w} markets · ${d.modelStats.gamesCompleted} games</span>`;
-
   // Per-confidence accuracy — computed live from completed matches
   const confBuckets = {};
   d.matches.filter(m => m.status === 'completed').forEach(m => {
@@ -1292,6 +1311,18 @@ function buildPatItem(p) {
       if (p.correct) confBuckets[p.conf].ok++;
     });
   });
+
+  // HIGH confidence % (XH + H combined) — shown in gauge + nav
+  const hb = { ok: 0, tot: 0 };
+  ['XH','H'].forEach(k => { if (confBuckets[k]) { hb.ok += confBuckets[k].ok; hb.tot += confBuckets[k].tot; }});
+  const highPct  = hb.tot > 0 ? Math.round(hb.ok / hb.tot * 100) : pct;
+  const highFrac = hb.tot > 0 ? `${hb.ok}/${hb.tot}` : `${c}/${c+w}`;
+
+  // Nav accuracy — show HIGH % with tooltip
+  document.getElementById('nav-acc').innerHTML = `
+    <span class="nav-acc-rate" title="Accuracy on HIGH confidence picks only">${highPct}%</span>
+    <span class="nav-acc-sep"></span>
+    <span class="nav-acc-detail" title="HIGH confidence picks only (${highFrac})">${highFrac} HIGH · ${d.modelStats.gamesCompleted} games</span>`;
 
   // Build confidence breakdown rows (high tiers first)
   const confRows = ['XH','H','MH','M','ML','L']
@@ -1323,7 +1354,7 @@ function buildPatItem(p) {
     <span class="chip chip-b">${d.modelStats.gamesCompleted} games</span>`;
   setTimeout(() => {
     document.getElementById('sb-bar').style.width = pct + '%';
-    animateGauge(pct);
+    animateGauge(highPct);
   }, 400);
 
   // Sidebar groups
