@@ -7,12 +7,12 @@ const WC_DATA = {
   venmo: "mdogra3", // Venmo handle — links auto-generated from this
 
   modelStats: {
-    gamesAnalyzed:   4,
+    gamesAnalyzed:   6,
     gamesCompleted:  2,
     marketsTracked:  16,
     marketsCorrect:  12,
     marketsWrong:    4,
-    marketsPending:  14,
+    marketsPending:  34,
   },
 
   groups: [
@@ -126,6 +126,72 @@ const WC_DATA = {
     },
 
     // ── PENDING / UPCOMING ─────────────────────────────────────────────────
+    {
+      id: "nor-sen",
+      date: "Jun 22",
+      homeTeam: { name: "Norway",  flag: "🇳🇴", code: "NOR" },
+      awayTeam: { name: "Senegal", flag: "🇸🇳", code: "SEN" },
+      status: "pending",
+      kickoff: "7:00 PM CDT",
+      predictions: {
+        winner:     { call: "Draw ⭐ (vs NOR lean)", result: null, correct: null, conf: "M" },
+        overUnder:  { call: "Under 2.5",             result: null, correct: null, conf: "M" },
+        btts:       { call: "Yes",                   result: null, correct: null, conf: "M" },
+        firstHalf:  { call: "U1.5 ⭐",              result: null, correct: null, conf: "H" },
+        secondHalf: { call: "O0.5",                  result: null, correct: null, conf: "H" },
+        scorer1:    { call: "Haaland",               result: null, correct: null, conf: "H" },
+        scorer2:    { call: "Sorloth ⭐",            result: null, correct: null, conf: "M" },
+      },
+      keyInsight: "Senegal must-not-lose + Norway comfortable with draw = structural draw the cluster ignores. Koulibaly + Idrissa Gana Gueye double pivot are the tactical factors nobody mentions. Draw at +230 is the value call.",
+      score: { correct: null, total: 7 },
+      report: {
+        consensus: "Norway win — narrow majority. Split on the draw at +230 (Covers.com explicit value call). Over 2.5 from SportsLine citing Norway's 8 goals. Critical cluster contradiction: sources backing NOR win + Over assume SEN attacks openly; sources backing draw assume SEN defends first. These cannot both be right — group table determines which is correct.",
+        gameFlow: {
+          home:      "Norway — win = qualify tonight, but draw = 4pts, comfortable for MD3 vs France. Solbakken has no reason to gamble.",
+          away:      "Senegal — MUST NOT LOSE. Not a pure must-win. Minimum 1 point. Will defend first, probe second — not throw men forward recklessly.",
+          mechanism: "NOR: Wide delivery → Haaland central run. Odegaard through-balls. Sorloth arrives unmarked when Koulibaly double-covers Haaland. SEN: Mane counter-attack central channel. Sarr pace vs Wolfe (Norway's least tested FB). Jackson in behind.",
+          trigger:   "55-65' if 0-0 — Norway push Aursnes higher. Senegal's internal tension (need a point, can't afford to lose) creates hesitation at the decision moment.",
+        },
+        stressTest: [
+          "Cluster's Over lean assumes SEN attack openly — group table says they won't. Must-not-lose posture = defensive first → Under 2.5",
+          "Idrissa Gana Gueye screening Odegaard — nobody in the cluster mentions this. If Gueye wins the midfield battle, Haaland's service drops dramatically",
+          "Haaland vs Koulibaly ≠ Haaland vs Iraq. Norway's 11-of-12 inside-box shots was against the worst defense in the tournament. Quality adjustment required",
+          "Draw structurally supported by BOTH teams' group positions — when both teams' optimal minimum is the same outcome, the win lean is structurally wrong",
+        ],
+      },
+    },
+    {
+      id: "alg-jor",
+      date: "Jun 22",
+      homeTeam: { name: "Algeria", flag: "🇩🇿", code: "ALG" },
+      awayTeam: { name: "Jordan",  flag: "🇯🇴", code: "JOR" },
+      status: "pending",
+      kickoff: "10:00 PM CDT",
+      predictions: {
+        winner:    { call: "Algeria",      result: null, correct: null, conf: "M" },
+        overUnder: { call: "Over 2.5 ⭐",  result: null, correct: null, conf: "H" },
+        btts:      { call: "Yes ⭐",       result: null, correct: null, conf: "H" },
+        firstHalf: { call: "U1.5",         result: null, correct: null, conf: "M" },
+        scorer1:   { call: "Al-Dardour",   result: null, correct: null, conf: "M" },
+      },
+      keyInsight: "Both teams must win to control MD3 destiny. Locked pattern runs in reverse: both attack from KO, neither can park the bus. Jordan's defensive DNA is irrelevant tonight. Over/BTTS is the structural call — not the quality call.",
+      score: { correct: null, total: 5 },
+      report: {
+        consensus: "Algeria expected favorite (~-150 to -200) on ranking/squad quality. Over lean from 'both desperate' narrative. Key trap: 'Algeria redemption after 0-3 humiliation' — scoreline anchoring. The 0-3 was against Romero/Lisandro. Jordan's backline is categorically different.",
+        gameFlow: {
+          home:      "Algeria — must win to face AUT in MD3 (vs ARG if they lose). Push forward from the start. Mahrez (if fit) is the key creative mechanism.",
+          away:      "Jordan — must win to face ARG rotation in MD3 (vs AUT if they lose). Defensive DNA (deep block) is their strength — but tonight they're forced to abandon it.",
+          mechanism: "ALG: Mahrez quality in behind Jordan's flat backline (key unknown — confirm lineup). Slimani hold-up + runners. Set pieces. JOR: Al-Dardour physical duels + set pieces. Al-Taamari pace in transition. Counter when Algeria overcommit.",
+          trigger:   "Game is open from kick-off — no trigger needed. Both chasing. First goal escalates the chasing team's desperation immediately, accelerating further goals.",
+        },
+        stressTest: [
+          "Algeria's 0 shots on target was vs Romero/Lisandro — best CB pair in the tournament. Cannot project forward. Algeria vs Jordan's average backline is a completely different game",
+          "Jordan's 1-3 scoreline overstates how poor they were — 4 shots on target (more than Austria's 3), scored at 50', then conceded OG + stoppage pen. They are more competitive than that result implies",
+          "Jordan's defensive DNA is irrelevant tonight — must-win forces them to abandon their best shape. A Jordan chasing a goal is Jordan at their defensive worst",
+          "Mahrez is the biggest swing factor — if he starts, Algeria's ceiling vs Jordan's backline rises dramatically. Confirm before backing ALG -1.5 AH",
+        ],
+      },
+    },
     {
       id: "fra-irq",
       date: "Jun 22",
