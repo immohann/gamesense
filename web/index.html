@@ -652,6 +652,73 @@ table.mgt td:first-child { text-align:left; }
 }
 
 /* ══════════════════════════════════════════════════════════════
+   VENMO MODAL
+══════════════════════════════════════════════════════════════ */
+#venmo-modal {
+  display:none; position:fixed; inset:0; z-index:900;
+  align-items:center; justify-content:center;
+}
+#venmo-modal.open { display:flex; }
+.vm-overlay {
+  position:absolute; inset:0;
+  background:rgba(2,6,23,.75);
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  cursor:pointer;
+}
+.vm-card {
+  position:relative; z-index:1;
+  background:var(--bg-2);
+  border:1px solid var(--border-hi);
+  border-radius:18px;
+  padding:28px 26px 24px;
+  max-width:310px; width:92%;
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  box-shadow:0 30px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(59,130,246,.1);
+  animation:vm-in .22s cubic-bezier(.34,1.56,.64,1);
+}
+[data-theme="light"] .vm-card { background:var(--bg-2); box-shadow:0 20px 60px rgba(0,0,40,.18); }
+@keyframes vm-in {
+  from { opacity:0; transform:scale(.88) translateY(16px); }
+  to   { opacity:1; transform:scale(1)   translateY(0); }
+}
+.vm-close {
+  position:absolute; top:12px; right:12px;
+  width:26px; height:26px; border-radius:50%;
+  background:var(--border); color:var(--text-3);
+  font-size:12px; display:flex; align-items:center; justify-content:center;
+  transition:background .15s,color .15s;
+}
+.vm-close:hover { background:var(--red-dim); color:var(--red); }
+.vm-title {
+  font-family:'Bebas Neue', var(--font-d);
+  font-size:26px; letter-spacing:.12em;
+  background:var(--gd-alt);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  text-align:center; line-height:1;
+}
+.vm-sub { font-size:11.5px; color:var(--text-3); text-align:center; margin-top:-4px; line-height:1.5; }
+.vm-qr-wrap {
+  background:#fff; border-radius:14px; padding:14px;
+  margin:6px 0 2px;
+  box-shadow:0 4px 20px rgba(0,0,0,.2);
+}
+.vm-qr { width:190px; height:190px; display:block; border-radius:4px; }
+.vm-hint {
+  font-family:var(--font-n); font-size:9.5px; color:var(--text-3);
+  letter-spacing:.08em; text-align:center;
+}
+.vm-link {
+  display:flex; align-items:center; gap:8px;
+  font-family:var(--font-b); font-size:13px; font-weight:700;
+  padding:10px 28px; border-radius:50px;
+  background:rgba(61,149,206,.18); border:1px solid rgba(61,149,206,.4); color:#4aa8d8;
+  transition:all .2s; white-space:nowrap;
+  box-shadow:0 2px 12px rgba(61,149,206,.12);
+  margin-top:2px;
+}
+.vm-link:hover { background:#3d95ce; color:#fff; box-shadow:0 4px 20px rgba(61,149,206,.4); transform:translateY(-1px); }
+
+/* ══════════════════════════════════════════════════════════════
    FOOTER
 ══════════════════════════════════════════════════════════════ */
 footer {
@@ -853,14 +920,13 @@ footer span { font-family:var(--font-n); font-size:10px; color:var(--text-3); }
           </svg>
         </div>
         <div class="support-text">
-          <div class="support-title">Did the model pay you?</div>
-          <div class="support-sub">xG digs, group table math, stress-testing expert consensus — if it paid off, send a coffee.</div>
+          <div class="support-title">Buy a brother a beer</div>
+          <div class="support-sub">Cheers — xG digs, group table math, stress-testing the whole expert cluster. If it hit, scan the QR.</div>
         </div>
-        <!-- href set by JS from data.venmo -->
-        <a class="venmo-cta" id="venmo-cta" href="#" target="_blank" rel="noopener" aria-label="Send Venmo payment">
+        <button class="venmo-cta" id="venmo-cta" onclick="openVenmoModal()" aria-label="Open Venmo QR code">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.32 3C17 5.8 15.9 8.7 15.2 11.6H11.7C11 8.1 9.4 5.1 7.68 3L4 4.5C5.68 8.23 6.72 12.2 6.72 16.5H11.5v.12C11.5 18.5 10.8 20.3 9.5 21.7l4 .3C15.6 20.5 16.8 18.4 17 16v-.5c.2-5.1 1.22-9.9 3-13.6L18.32 3Z"/></svg>
-          Send on Venmo
-        </a>
+          Scan QR / Venmo
+        </button>
       </div>
     </div>
 
@@ -877,6 +943,25 @@ footer span { font-family:var(--font-n); font-size:10px; color:var(--text-3); }
     Game Sense provides statistical analysis for informational and entertainment purposes only. Nothing published here constitutes financial, betting, or investment advice of any kind. All model outputs are generated from publicly available data and are for informational use only. Past model accuracy is not indicative of future results. Gambling involves significant financial risk — please gamble responsibly. You must be 18 years of age or older, or of the legal gambling age in your jurisdiction, to engage in sports wagering.
   </div>
 </footer>
+
+<!-- ══════ VENMO MODAL ══════ -->
+<div id="venmo-modal" role="dialog" aria-modal="true" aria-label="Support via Venmo">
+  <div class="vm-overlay" onclick="closeVenmoModal()"></div>
+  <div class="vm-card">
+    <button class="vm-close" onclick="closeVenmoModal()" aria-label="Close">✕</button>
+    <div class="vm-title">Buy a Brother a Beer</div>
+    <div class="vm-sub">Cheers — if the picks paid off, here's how to say thanks</div>
+    <div class="vm-qr-wrap">
+      <img class="vm-qr" src="venmo-qr.png" alt="Venmo QR Code"
+           onerror="this.onerror=null;this.src='https://api.qrserver.com/v1/create-qr-code/?size=190x190&color=000000&bgcolor=ffffff&data=https%3A%2F%2Fvenmo.com%2Fcode%3Fuser_id%3D3517897645229126606'">
+    </div>
+    <div class="vm-hint">Scan with your phone camera or Venmo app</div>
+    <a class="vm-link" href="https://venmo.com/code?user_id=3517897645229126606" target="_blank" rel="noopener" onclick="closeVenmoModal()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.32 3C17 5.8 15.9 8.7 15.2 11.6H11.7C11 8.1 9.4 5.1 7.68 3L4 4.5C5.68 8.23 6.72 12.2 6.72 16.5H11.5v.12C11.5 18.5 10.8 20.3 9.5 21.7l4 .3C15.6 20.5 16.8 18.4 17 16v-.5c.2-5.1 1.22-9.9 3-13.6L18.32 3Z"/></svg>
+      Open in Venmo App
+    </a>
+  </div>
+</div>
 
 <!-- Three.js -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
@@ -1237,6 +1322,17 @@ function buildCard(m) {
   return el;
 }
 
+/* ── Venmo modal ── */
+function openVenmoModal() {
+  document.getElementById('venmo-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeVenmoModal() {
+  document.getElementById('venmo-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVenmoModal(); });
+
 function toggleCard(id, summaryEl) {
   const body  = document.getElementById(id);
   const caret = document.getElementById(id + '-caret');
@@ -1313,15 +1409,11 @@ function buildPatItem(p) {
   const { marketsCorrect:c, marketsWrong:w } = d.modelStats;
   const pct = Math.round(c/(c+w)*100);
 
-  // Venmo links
+  // Venmo nav button → opens modal
   if (d.venmo) {
-    const href = `https://venmo.com/u/${d.venmo}`;
-    document.getElementById('venmo-nav').href = '#support';
-    document.getElementById('venmo-nav').onclick = null;
-    document.getElementById('venmo-cta').href = href;
-    document.getElementById('venmo-nav').href = href;
-    document.getElementById('venmo-nav').target = '_blank';
-    document.getElementById('venmo-nav').rel = 'noopener';
+    const navBtn = document.getElementById('venmo-nav');
+    navBtn.href = '#';
+    navBtn.onclick = e => { e.preventDefault(); openVenmoModal(); };
   }
 
   // Footer
