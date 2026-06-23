@@ -196,17 +196,7 @@ button { cursor:pointer; font-family:inherit; border:none; background:none; }
 .sb-sticky-wrap {
   position:sticky; top:62px;
   display:flex; flex-direction:column; gap:12px;
-  max-height:calc(100vh - 80px);
-  overflow-y:auto;
-  scrollbar-width:thin;
-  scrollbar-color:rgba(255,255,255,.12) transparent;
-  padding-right:3px;
 }
-.sb-sticky-wrap::-webkit-scrollbar { width:3px; }
-.sb-sticky-wrap::-webkit-scrollbar-track { background:transparent; }
-.sb-sticky-wrap::-webkit-scrollbar-thumb { background:rgba(255,255,255,.15); border-radius:2px; }
-[data-theme="light"] .sb-sticky-wrap { scrollbar-color:rgba(0,0,0,.18) transparent; }
-[data-theme="light"] .sb-sticky-wrap::-webkit-scrollbar-thumb { background:rgba(0,0,0,.2); }
 
 /* Sidebar base card */
 .sb-card {
@@ -271,47 +261,6 @@ button { cursor:pointer; font-family:inherit; border:none; background:none; }
 }
 [data-theme="light"] .sb-head { background:rgba(0,0,0,.04); }
 
-/* Mini group tables */
-.mg-group-block { border-bottom:1px solid var(--border); }
-.mg-group-block:last-child { border-bottom:none; }
-.mg-title {
-  display:flex; align-items:center; gap:8px;
-  padding:6px 14px;
-  background:rgba(0,0,0,.1);
-}
-[data-theme="light"] .mg-title { background:rgba(0,0,0,.03); }
-.mg-letter {
-  font-family:var(--font-d);
-  font-size:14px; font-weight:900;
-  background:var(--gd-alt);
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-}
-.mg-teams { font-size:10px; color:var(--text-3); line-height:1.3; }
-table.mgt { width:100%; border-collapse:collapse; }
-table.mgt td {
-  padding:5px 14px;
-  font-size:11px;
-  border-bottom:1px solid rgba(255,255,255,.03);
-  text-align:right;
-}
-[data-theme="light"] table.mgt td { border-bottom-color:rgba(0,0,0,.03); }
-table.mgt tr:last-child td { border-bottom:none; }
-table.mgt td:first-child { text-align:left; }
-.mgt-row { display:flex; align-items:center; gap:6px; }
-.mgt-pos {
-  font-family:var(--font-n);
-  font-size:9px; color:var(--text-3); width:10px; text-align:right; flex-shrink:0;
-}
-.mgt-flag { font-size:13px; }
-.mgt-name { font-size:11px; color:var(--text-2); }
-.mgt-pts { font-family:var(--font-n); font-weight:600; color:var(--text); }
-.mgt-gd  { font-family:var(--font-n); font-size:10px; }
-.mgt-q td { background:rgba(34,197,94,.04); }
-.qdot {
-  display:inline-block; width:5px; height:5px;
-  border-radius:50%; background:var(--green);
-  margin-left:4px; vertical-align:middle;
-}
 
 /* Confidence accuracy breakdown */
 #sb-conf-breakdown { padding-bottom:6px; }
@@ -328,28 +277,6 @@ table.mgt td:first-child { text-align:left; }
 .conf-acc-bar { height:100%; border-radius:2px; transition:width 1s ease; }
 .conf-acc-frac { font-family:var(--font-n); font-size:12px; font-weight:600; min-width:32px; text-align:right; }
 
-/* Pattern list */
-.pat-item {
-  display:flex; align-items:flex-start; gap:10px;
-  padding:10px 14px;
-  border-bottom:1px solid rgba(255,255,255,.03);
-  border-left:2px solid transparent;
-  transition:background .15s, border-color .15s;
-}
-[data-theme="light"] .pat-item { border-bottom-color:rgba(0,0,0,.04); }
-.pat-item:last-child { border-bottom:none; }
-.pat-item:hover { background:rgba(245,158,11,.06); border-left-color:var(--amber); }
-.pat-id {
-  font-family:var(--font-n);
-  font-size:16px; font-weight:600;
-  color:rgba(255,255,255,.08);
-  flex-shrink:0; line-height:1.1; padding-top:2px; width:24px;
-}
-[data-theme="light"] .pat-id { color:rgba(0,0,0,.12); }
-.pat-lock-icon { flex-shrink:0; padding-top:2px; color:var(--amber); opacity:.8; }
-.pat-text {}
-.pat-title { font-size:12px; font-weight:600; color:var(--text); margin-bottom:3px; }
-.pat-desc  { font-size:10.5px; color:var(--text-3); line-height:1.5; }
 
 /* ══════════════════════════════════════════════════════════════
    MAIN CONTENT
@@ -867,18 +794,6 @@ footer span { font-family:var(--font-n); font-size:10px; color:var(--text-3); }
         <div id="sb-conf-breakdown"></div>
       </div>
 
-      <!-- Group standings -->
-      <div class="sb-card anim">
-        <div class="sb-head">Group Standings</div>
-        <div id="sb-groups"></div>
-      </div>
-
-      <!-- Locked patterns -->
-      <div class="sb-card anim">
-        <div class="sb-head">Locked Patterns</div>
-        <div id="sb-patterns"></div>
-      </div>
-
     </div>
   </aside>
 
@@ -1352,55 +1267,6 @@ function toggleReport(id, btn) {
 /* ══════════════════════════════════════════════════════════════
    BUILD: SIDEBAR GROUP
 ══════════════════════════════════════════════════════════════ */
-function buildMiniGroup(g) {
-  const el = document.createElement('div');
-  el.className = 'mg-group-block';
-  const names = g.teams.map(t => t.name.split(' ')[0]).join(' · ');
-  el.innerHTML = `
-    <div class="mg-title">
-      <div class="mg-letter">${g.id}</div>
-      <div class="mg-teams">${names}</div>
-    </div>
-    <table class="mgt" aria-label="Group ${g.id} standings">
-      <tbody>
-        ${g.teams.map((t,i) => {
-          const gd  = t.gf - t.ga;
-          const gdC = gd>0 ? 'var(--green)' : gd<0 ? 'var(--red)' : 'var(--text-3)';
-          const qdot = t.qualified ? '<span class="qdot" title="Qualified"></span>' : '';
-          return `<tr class="${t.qualified?'mgt-q':''}">
-            <td>
-              <div class="mgt-row">
-                <span class="mgt-pos">${i+1}</span>
-                <span class="mgt-flag">${t.flag}</span>
-                <span class="mgt-name">${t.name}${qdot}</span>
-              </div>
-            </td>
-            <td><span class="mgt-gd" style="color:${gdC}">${gd>0?'+':''}${gd}</span></td>
-            <td><span class="mgt-pts">${t.pts}</span></td>
-          </tr>`;
-        }).join('')}
-      </tbody>
-    </table>`;
-  return el;
-}
-
-/* ══════════════════════════════════════════════════════════════
-   BUILD: SIDEBAR PATTERN
-══════════════════════════════════════════════════════════════ */
-function buildPatItem(p) {
-  const el = document.createElement('div');
-  el.className = 'pat-item';
-  const shortDetail = p.detail.length > 88 ? p.detail.slice(0,85) + '…' : p.detail;
-  el.innerHTML = `
-    <div class="pat-id">0${p.id}</div>
-    <div class="pat-lock-icon">${ICONS.lock}</div>
-    <div class="pat-text">
-      <div class="pat-title">${p.title}</div>
-      <div class="pat-desc">${shortDetail}</div>
-    </div>`;
-  return el;
-}
-
 /* ══════════════════════════════════════════════════════════════
    INIT
 ══════════════════════════════════════════════════════════════ */
@@ -1475,13 +1341,6 @@ function buildPatItem(p) {
     animateGauge(highPct);
   }, 400);
 
-  // Sidebar groups
-  const sbG = document.getElementById('sb-groups');
-  d.groups.forEach(g => sbG.appendChild(buildMiniGroup(g)));
-
-  // Sidebar patterns
-  const sbP = document.getElementById('sb-patterns');
-  d.patterns.forEach(p => sbP.appendChild(buildPatItem(p)));
 
   // Matches
   const live = d.matches.filter(m => m.status !== 'completed');
